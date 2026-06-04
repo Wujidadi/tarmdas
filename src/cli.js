@@ -18,10 +18,11 @@ tarmdas — 本地離線 Markdown → 單一 HTML 轉換工具
       --css <file>           自訂樣式檔（.css/.scss/.sass/.less），可重複指定
       --external-assets      改用「HTML + 旁置資產夾」模式
       --max-inline-size <n>  inline 模式媒體內嵌上限，支援 k/m/g 後綴（預設 5m）
-      --theme <name>         文件主題，共 14 種：github（自動）/ github-light / github-dark /
+      --theme <name>         文件主題，共 17 種：github（自動）/ github-light / github-dark /
                              one-light / one-dark / gruvbox-light / gruvbox-dark /
                              tokyo-night-light / tokyo-night-dark / solarized-light /
-                             solarized-dark / monokai / dracula / nord（預設 github）
+                             solarized-dark / monokai / dracula / nord /
+                             xai（自動）/ xai-light / xai-dark（預設 github）
       --highlight-theme <n>  覆寫程式碼配色（highlight.js 主題；預設跟隨文件主題）
       --title <text>         文件標題（預設取 front-matter 或首個 H1）
       --breaks               段落內單一換行渲染為 <br>（預設依 Markdown 標準視為空格）

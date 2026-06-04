@@ -1,0 +1,16 @@
+// x.ai 自動主題：依系統 prefers-color-scheme 在淺/深之間切換
+// 程式碼配色連動 highlight.js 的 tokyo-night 淺/深主題，Mermaid 於初始化依系統偏好選色
+@use 'base';
+@use 'xai-palette' as xai;
+
+:root {
+  @include xai.light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    @include xai.dark;
+  }
+}
+
+@include xai.chrome;

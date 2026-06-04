@@ -1,0 +1,9 @@
+// x.ai 淺色主題。搭配 highlight.js "tokyo-night-light" 與 Mermaid "default"
+@use 'base';
+@use 'xai-palette' as xai;
+
+:root {
+  @include xai.light;
+}
+
+@include xai.chrome;

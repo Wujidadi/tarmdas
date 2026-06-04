@@ -83,6 +83,21 @@ export const PRESETS = {
     highlight: 'base16/solarized-dark',
     mermaid: 'dark',
   },
+  xai: {
+    scss: 'xai.scss',
+    highlight: { light: 'tokyo-night-light', dark: 'tokyo-night-dark' },
+    mermaid: 'auto',
+  },
+  'xai-light': {
+    scss: 'xai-light.scss',
+    highlight: 'tokyo-night-light',
+    mermaid: 'default',
+  },
+  'xai-dark': {
+    scss: 'xai-dark.scss',
+    highlight: 'tokyo-night-dark',
+    mermaid: 'dark',
+  },
 };
 
 export const DEFAULT_PRESET = 'github';
