@@ -201,3 +201,21 @@ pre.mermaid {
 .footnote-backref {
   text-decoration: none;
 }
+
+// 高亮標記 ==text==：以柔和螢光底色標示，依主題 color-scheme 自動切換淺/深
+mark {
+  padding: 0.05em 0.2em;
+  border-radius: 3px;
+  color: inherit;
+  background: light-dark(#fff3a3, #5e560f);
+}
+
+// 定義清單：詞條粗體，定義縮排
+dt {
+  margin-top: 0.8em;
+  font-weight: 600;
+}
+
+dd {
+  margin: 0.2em 0 0 1.5em;
+}

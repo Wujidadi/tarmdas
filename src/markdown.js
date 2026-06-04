@@ -1,8 +1,23 @@
-// markdown-it 實例組裝：程式碼高亮（highlight.js）、數學（KaTeX via texmath）、
-// Mermaid fence、GitHub Alerts 警示區塊、GFM 任務清單、腳註、標題錨點
+// markdown-it 實例組裝：
+// - 程式碼高亮（highlight.js）
+// - 數學（KaTeX via texmath）
+// - Mermaid fence
+// - GitHub Alerts 警示區塊
+// - GFM 任務清單
+// - 腳註
+// - 標題錨點
+// - 定義清單
+// - 高亮
+// - 上標/下標
+// - Emoji 短碼
 import MarkdownIt from 'markdown-it';
 import texmath from 'markdown-it-texmath';
 import footnote from 'markdown-it-footnote';
+import deflist from 'markdown-it-deflist';
+import mark from 'markdown-it-mark';
+import sub from 'markdown-it-sub';
+import sup from 'markdown-it-sup';
+import { full as emoji } from 'markdown-it-emoji';
 import katex from 'katex';
 import hljs from 'highlight.js';
 
@@ -74,6 +89,11 @@ export function createMarkdownIt(opts = {}) {
   md.use(githubAlerts);
   md.use(taskLists);
   md.use(footnote);
+  md.use(deflist);
+  md.use(mark);
+  md.use(sub);
+  md.use(sup);
+  md.use(emoji);
   md.use(headingAnchors);
 
   return md;

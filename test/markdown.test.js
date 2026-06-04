@@ -104,3 +104,28 @@ test('錨點：同名標題以序號去重、標點移除、空白轉連字號',
   assert.ok(html.includes('id="hello-world"'), '首個應為 hello-world');
   assert.ok(html.includes('id="hello-world-1"'), '重複者應加序號');
 });
+
+test('定義清單：詞條與定義轉為 dl/dt/dd', () => {
+  const { html } = renderMarkdown('詞條\n: 定義內容\n');
+  assert.ok(html.includes('<dl>'));
+  assert.ok(html.includes('<dt>詞條</dt>'));
+  assert.ok(html.includes('<dd>定義內容</dd>'));
+});
+
+test('高亮：==text== 轉為 mark', () => {
+  const { html } = renderMarkdown('這是 ==重點== 標示\n');
+  assert.ok(html.includes('<mark>重點</mark>'));
+});
+
+test('上標／下標：^x^ 與 ~x~ 轉為 sup/sub，且不影響刪除線', () => {
+  const { html } = renderMarkdown('x^2^ 與 H~2~O 與 ~~刪除~~\n');
+  assert.ok(html.includes('x<sup>2</sup>'), '上標');
+  assert.ok(html.includes('H<sub>2</sub>O'), '下標');
+  assert.ok(html.includes('<s>刪除</s>'), '刪除線仍正常');
+});
+
+test('Emoji：短碼轉為 Unicode 字元', () => {
+  const { html } = renderMarkdown('完成 :rocket:\n');
+  assert.ok(html.includes('🚀'), ':rocket: 應轉為火箭');
+  assert.ok(!html.includes(':rocket:'), '短碼不應殘留');
+});

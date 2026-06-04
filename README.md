@@ -20,6 +20,7 @@ Tarmdas 把單一 Markdown 檔轉成單一、可離線開啟的 HTML 檔——�
 - **任務清單**：支援 `- [ ]`／`- [x]` GFM 任務清單，轉為唯讀核取方塊（與 GitHub 一致，僅展示不可勾選）
 - **腳註**：支援 `[^1]` 腳註，於底部生成附回跳連結的腳註區
 - **標題錨點**：各級標題自動產生 GitHub 風格 slug id（保留中文）與可點擊錨點，便於頁內跳轉與分享段落連結
+- **延伸語法**：定義清單（`詞\n: 解釋`）、高亮 `==重點==`、上標 `x^2^`／下標 `H~2~O`、Emoji 短碼 `:rocket:`（建置期轉為 Unicode 字元）
 - **內建主題**：GitHub、One、Gruvbox、Tokyo Night、Solarized、Monokai、Dracula、Nord、xAI 等共 17 種（多數含淺/深），正文、程式碼、Mermaid 三處配色一致
 - **自訂樣式**：支援 CSS 與 SASS / SCSS / LESS 預處理
 - **Live Reload**：可選擇性啟用；預設不啟動任何伺服器
