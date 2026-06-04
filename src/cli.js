@@ -24,6 +24,7 @@ tarmdas — 本地離線 Markdown → 單一 HTML 轉換工具
                              solarized-dark / monokai / dracula / nord（預設 github）
       --highlight-theme <n>  覆寫程式碼配色（highlight.js 主題；預設跟隨文件主題）
       --title <text>         文件標題（預設取 front-matter 或首個 H1）
+      --breaks               段落內單一換行渲染為 <br>（預設依 Markdown 標準視為空格）
       --no-math              停用 KaTeX
       --no-mermaid           停用 Mermaid
       --no-highlight         停用程式碼高亮
@@ -58,6 +59,7 @@ const OPTIONS = {
   theme: { type: 'string', default: 'github' },
   'highlight-theme': { type: 'string' },
   title: { type: 'string' },
+  breaks: { type: 'boolean', default: false },
   'no-math': { type: 'boolean', default: false },
   'no-mermaid': { type: 'boolean', default: false },
   'no-highlight': { type: 'boolean', default: false },
@@ -103,6 +105,7 @@ export async function run(argv = process.argv.slice(2)) {
     theme: values.theme,
     highlightTheme: values['highlight-theme'],
     title: values.title,
+    breaks: values.breaks,
     math: !values['no-math'],
     mermaid: !values['no-mermaid'],
     highlight: !values['no-highlight'],

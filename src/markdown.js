@@ -33,15 +33,17 @@ function highlight(md, str, lang) {
  * @param {object} [opts]
  * @param {boolean} [opts.math=true]      啟用 KaTeX
  * @param {boolean} [opts.highlight=true] 啟用程式碼高亮
+ * @param {boolean} [opts.breaks=false]   段落內單一換行渲染為 <br>
  * @returns {MarkdownIt}
  */
 export function createMarkdownIt(opts = {}) {
-  const { math = true, highlight: useHighlight = true } = opts;
+  const { math = true, highlight: useHighlight = true, breaks = false } = opts;
 
   const md = new MarkdownIt({
     html: true,
     linkify: true,
     typographer: false,
+    breaks,
     highlight: useHighlight ? (str, lang) => highlight(md, str, lang) : undefined,
   });
 

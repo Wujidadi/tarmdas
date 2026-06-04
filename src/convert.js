@@ -55,6 +55,7 @@ function resolveTitle({ explicit, frontMatter, bodyHtml, fallback }) {
  * @param {boolean} [opts.math=true]            啟用 KaTeX
  * @param {boolean} [opts.mermaid=true]         啟用 Mermaid
  * @param {boolean} [opts.highlight=true]       啟用程式碼高亮
+ * @param {boolean} [opts.breaks=false]         段落內單一換行渲染為 <br>
  * @param {boolean} [opts.liveReload=false]     注入 Live Reload 腳本
  * @returns {Promise<{ html: string, title: string, features: object, media: { inlined: number, copied: string[] } }>}
  */
@@ -71,13 +72,14 @@ export async function renderDocument(source, opts) {
     math = true,
     mermaid = true,
     highlight = true,
+    breaks = false,
     liveReload = false,
   } = opts;
 
   const { data: frontMatter, content } = parseFrontMatter(source);
 
   // 1) Markdown → HTML 片段，並回報實際用到的功能
-  const { html: rendered, features } = renderMarkdown(content, { math, highlight });
+  const { html: rendered, features } = renderMarkdown(content, { math, highlight, breaks });
   const useMath = math && features.math;
   const useMermaid = mermaid && features.mermaid;
   const useCode = highlight && features.code;

@@ -38,6 +38,18 @@ test('GitHub Alerts：標記同行有其他文字時維持一般引用', () => {
   assert.ok(!html.includes('markdown-alert'), '不應轉為警示區塊');
 });
 
+test('breaks：預設依標準將段落內單一換行視為空格', () => {
+  const { html } = renderMarkdown('第一行\n第二行\n');
+  assert.ok(!html.includes('<br'), '預設不應出現 <br>');
+});
+
+test('breaks：啟用後段落內單一換行渲染為 <br>', () => {
+  const { html } = renderMarkdown('第一行\n第二行\n', { breaks: true });
+  assert.ok(html.includes('<br'), '應出現 <br>');
+  assert.ok(html.includes('第一行'));
+  assert.ok(html.includes('第二行'));
+});
+
 test('GitHub Alerts：未知類型與一般引用不受影響', () => {
   const { html } = renderMarkdown('> [!FOO]\n> 內容\n\n> 一般引用\n');
   assert.ok(!html.includes('markdown-alert'));

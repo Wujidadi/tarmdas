@@ -83,6 +83,7 @@ node bin/tarmdas.js examples/sample.md -o examples/sample-external.html --extern
 | `--theme <name>`           | 文件主題，共 14 種（預設 github，完整清單見〈內建主題〉） |
 | `--highlight-theme <name>` | 覆寫程式碼配色（任一 highlight.js 主題）                  |
 | `--title <text>`           | 文件標題（預設取 front-matter 或首個 H1）                 |
+| `--breaks`                 | 段落內單一換行渲染為 `<br>`（預設視為空格）               |
 | `--no-math`                | 停用 KaTeX                                                |
 | `--no-mermaid`             | 停用 Mermaid                                              |
 | `--no-highlight`           | 停用程式碼高亮                                            |
