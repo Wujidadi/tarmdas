@@ -77,10 +77,9 @@ node bin/tarmdas.js examples/sample.md -o examples/sample-light-darkcode.html --
 node bin/tarmdas.js examples/sample.md -o examples/sample-external.html --external-assets
 ```
 
-也可一次產生多個主題的預覽，並列比較外觀（輸出目錄需先建立）：
+也可一次產生多個主題的預覽，並列比較外觀（輸出目錄不存在時會自動建立）：
 
 ```bash
-mkdir -p examples/themes-preview
 for theme in xai-dark xai-light github tokyo-night-dark dracula solarized-light; do
   node bin/tarmdas.js examples/sample.md \
     -o "examples/themes-preview/sample-$theme.html" --theme "$theme"

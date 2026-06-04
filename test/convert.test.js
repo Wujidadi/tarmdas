@@ -134,6 +134,15 @@ test('外置資產模式：一律複製到旁置夾並寫出 HTML', async () => 
   assert.deepEqual(assets, ['dot.png']);
 });
 
+test('輸出目錄不存在時自動建立（含多層）', async () => {
+  const dir = await tmpDir();
+  await writeFile(path.join(dir, 'in.md'), '# Hi\n');
+  const out = path.join(dir, 'deep', 'sub', 'out.html');
+  const { outputPath } = await convertFile(path.join(dir, 'in.md'), { output: out });
+  const html = await readFile(outputPath, 'utf8');
+  assert.ok(html.includes('Hi'), '應成功寫出至原本不存在的多層目錄');
+});
+
 test('外置資產模式：SVG 只複製一次（不重複處理已改寫的旁置路徑）', async () => {
   const dir = await tmpDir();
   await writeFile(path.join(dir, 'logo.svg'), '<svg xmlns="http://www.w3.org/2000/svg"><rect/></svg>');

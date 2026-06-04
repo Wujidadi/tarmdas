@@ -1,5 +1,5 @@
 // 核心轉檔管線：Markdown → 完整 HTML 文件（含 KaTeX、Mermaid、樣式、資產內嵌）
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 
 import { renderMarkdown } from './markdown.js';
@@ -152,6 +152,8 @@ export async function convertFile(inputPath, opts = {}) {
     outputPath,
   });
 
+  // 輸出目錄不存在時自動建立（含多層），避免寫檔失敗
+  await mkdir(path.dirname(outputPath), { recursive: true });
   await writeFile(outputPath, result.html, 'utf8');
   return { outputPath, title: result.title, features: result.features, media: result.media };
 }
