@@ -30,6 +30,23 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.3;
   margin: 1.8em 0 0.6em;
   font-weight: 600;
+  position: relative;
+
+  // 標題錨點：預設隱藏，滑入標題（或聚焦連結）時於左側淡入，不擠動標題文字
+  .header-anchor {
+    position: absolute;
+    left: -0.85em;
+    padding-right: 0.25em;
+    color: var(--quote-fg);
+    font-weight: 400;
+    text-decoration: none;
+    opacity: 0;
+  }
+
+  &:hover .header-anchor,
+  .header-anchor:focus {
+    opacity: 1;
+  }
 }
 
 h1 {
@@ -169,4 +186,18 @@ pre.mermaid {
   overflow-x: auto;
   overflow-y: hidden;
   padding: 0.5em 0;
+}
+
+// 腳註：底部以分隔線（hr.footnotes-sep 沿用上方 hr 樣式）區隔，內文字級略小、色彩較淡
+.footnotes {
+  font-size: 0.875em;
+  color: var(--quote-fg);
+}
+
+.footnotes-sep {
+  margin-top: 2.5em;
+}
+
+.footnote-backref {
+  text-decoration: none;
 }

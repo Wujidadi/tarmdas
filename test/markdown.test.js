@@ -82,3 +82,25 @@ test('Task List：一般清單項不受影響', () => {
   assert.ok(!html.includes('contains-task-list'), '純一般清單不應加類別');
   assert.ok(!html.includes('task-list-item-checkbox'));
 });
+
+test('腳註：[^1] 轉為上標參照與底部腳註區，含回跳連結', () => {
+  const { html } = renderMarkdown('正文[^1]。\n\n[^1]: 腳註內容\n');
+  assert.ok(html.includes('class="footnote-ref"'), '應有上標參照');
+  assert.ok(html.includes('id="fn1"'), '應有腳註項目');
+  assert.ok(html.includes('class="footnote-backref"'), '應有回跳連結');
+  assert.ok(html.includes('腳註內容'));
+  assert.ok(!html.includes('[^1]'), '標記不應殘留');
+});
+
+test('錨點：標題產生 slug id 與錨點連結，保留中文', () => {
+  const { html } = renderMarkdown('# 安裝指南\n');
+  assert.ok(html.includes('<h1 id="安裝指南">'), '標題應有中文 slug id');
+  assert.ok(html.includes('class="header-anchor"'), '應插入錨點連結');
+  assert.ok(html.includes('href="#安裝指南"'), '錨點應指向自身 id');
+});
+
+test('錨點：同名標題以序號去重、標點移除、空白轉連字號', () => {
+  const { html } = renderMarkdown('# Hello, World!\n# Hello, World!\n');
+  assert.ok(html.includes('id="hello-world"'), '首個應為 hello-world');
+  assert.ok(html.includes('id="hello-world-1"'), '重複者應加序號');
+});

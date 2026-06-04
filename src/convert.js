@@ -36,7 +36,8 @@ function resolveTitle({ explicit, frontMatter, bodyHtml, fallback }) {
   if (explicit) return explicit;
   if (frontMatter.title) return frontMatter.title;
   const h1 = bodyHtml.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
-  if (h1) return stripTags(h1[1]);
+  // 先移除標題錨點連結（含其 # 文字），避免洩漏進標題文字
+  if (h1) return stripTags(h1[1].replace(/<a class="header-anchor"[\s\S]*?<\/a>/i, ''));
   return fallback;
 }
 

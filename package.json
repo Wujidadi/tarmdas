@@ -36,6 +36,7 @@
     "highlight.js": "^11.10.0",
     "katex": "^0.16.11",
     "markdown-it": "^14.1.0",
+    "markdown-it-footnote": "^4.0.0",
     "markdown-it-texmath": "^1.0.0",
     "mermaid": "^11.4.0",
     "sass": "^1.80.0"
