@@ -54,6 +54,7 @@ Tarmdas
 正文中可加入腳註參照[^1]，也支援具名腳註[^offline]，內容會匯整到頁面底部
 
 [^1]: 這是第一個腳註的內容
+
 [^offline]: Tarmdas 產出的單檔可用 `file://` 直接離線開啟
 
 ## 警示區塊（GitHub Alerts）
