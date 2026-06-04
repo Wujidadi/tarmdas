@@ -37,7 +37,7 @@ npm install
 
 ## 使用範例
 
-以隨附的 [`examples/sample.md`](examples/sample.md)（涵蓋文字、表格、程式碼、KaTeX、Mermaid、圖片）為例：
+以隨附的 [`examples/sample.md`](examples/sample.md)（涵蓋文字、清單、任務清單、警示區塊、延伸行內語法、定義清單、腳註、自訂容器、目錄、表格、程式碼、KaTeX、Mermaid、圖片）為例：
 
 ```bash
 # 轉為自包含單檔（預設輸出 examples/sample.html）
