@@ -107,6 +107,16 @@ blockquote {
   &.markdown-alert-caution   { --alert-accent: light-dark(#cf222e, #f85149); }
 }
 
+// GFM 任務清單：僅任務項移除項目符號，核取方塊以負左邊距落在清單縮排處，與一般清單項並存時文字仍對齊（沿用 GitHub 作法）
+.task-list-item {
+  list-style-type: none;
+}
+
+.task-list-item-checkbox {
+  margin: 0 0.4em 0.25em -1.4em;
+  vertical-align: middle;
+}
+
 table {
   border-collapse: collapse;
   margin: 1em 0;

@@ -55,3 +55,30 @@ test('GitHub Alerts：未知類型與一般引用不受影響', () => {
   assert.ok(!html.includes('markdown-alert'));
   assert.equal((html.match(/<blockquote>/g) || []).length, 2);
 });
+
+test('Task List：[ ] 與 [x] 轉為唯讀核取方塊並移除標記', () => {
+  const { html } = renderMarkdown('- [ ] 未完成\n- [x] 已完成\n');
+  assert.ok(html.includes('class="contains-task-list"'), '清單應加上 contains-task-list');
+  assert.equal((html.match(/task-list-item-checkbox/g) || []).length, 2, '應有兩個核取方塊');
+  assert.ok(html.includes('checked=""'), '[x] 應為已勾選');
+  assert.ok(html.includes('disabled=""'), '核取方塊應為唯讀');
+  assert.ok(!html.includes('[ ]') && !html.includes('[x]'), '標記不應殘留');
+  assert.ok(html.includes('未完成') && html.includes('已完成'), '內文應保留');
+});
+
+test('Task List：大寫 [X] 亦視為已勾選', () => {
+  const { html } = renderMarkdown('- [X] 大寫\n');
+  assert.ok(html.includes('checked=""'), '[X] 應為已勾選');
+});
+
+test('Task List：有序清單不轉換，保留字面標記', () => {
+  const { html } = renderMarkdown('1. [ ] 一\n2. [x] 二\n');
+  assert.ok(!html.includes('task-list-item-checkbox'), '有序清單不應產生核取方塊');
+  assert.ok(html.includes('[ ]') && html.includes('[x]'), '應保留字面標記');
+});
+
+test('Task List：一般清單項不受影響', () => {
+  const { html } = renderMarkdown('- 一般項目\n- 另一項\n');
+  assert.ok(!html.includes('contains-task-list'), '純一般清單不應加類別');
+  assert.ok(!html.includes('task-list-item-checkbox'));
+});
