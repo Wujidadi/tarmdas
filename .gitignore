@@ -7,6 +7,7 @@ yarn-error.log*
 # 範例輸出（自包含 HTML 體積大且可重新生成，請自行執行指令在本地生成）
 examples/*.html
 examples/*.assets/
+examples/themes-preview/
 
 # macOS
 .DS_Store
