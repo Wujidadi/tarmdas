@@ -1,0 +1,14 @@
+// Dracula 主題。搭配 highlight.js "base16/dracula" 與 Mermaid "dark"
+@use 'base';
+
+:root {
+  color-scheme: dark;
+  --fg: #e9e9f4;
+  --bg: #282936;
+  --accent: #bd93f9;
+  --border: #44475a;
+  --quote-fg: #6272a4;
+  --quote-border: #44475a;
+  --table-stripe: rgba(255, 255, 255, 0.05);
+  --inline-code-bg: rgba(189, 147, 249, 0.15);
+}

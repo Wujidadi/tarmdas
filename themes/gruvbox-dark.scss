@@ -1,0 +1,14 @@
+// Gruvbox Dark 主題。搭配 highlight.js "base16/gruvbox-dark-medium" 與 Mermaid "dark"
+@use 'base';
+
+:root {
+  color-scheme: dark;
+  --fg: #ebdbb2;
+  --bg: #282828;
+  --accent: #83a598;
+  --border: #3c3836;
+  --quote-fg: #928374;
+  --quote-border: #3c3836;
+  --table-stripe: rgba(235, 219, 178, 0.05);
+  --inline-code-bg: #3c3836;
+}

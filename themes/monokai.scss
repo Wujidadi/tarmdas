@@ -1,0 +1,14 @@
+// Monokai 主題。搭配 highlight.js "monokai" 與 Mermaid "dark"
+@use 'base';
+
+:root {
+  color-scheme: dark;
+  --fg: #f8f8f2;
+  --bg: #272822;
+  --accent: #66d9ef;
+  --border: #49483e;
+  --quote-fg: #a59f85;
+  --quote-border: #49483e;
+  --table-stripe: rgba(255, 255, 255, 0.05);
+  --inline-code-bg: rgba(255, 255, 255, 0.1);
+}

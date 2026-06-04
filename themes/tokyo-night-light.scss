@@ -1,0 +1,14 @@
+// Tokyo Night Light 主題。搭配 highlight.js "tokyo-night-light" 與 Mermaid "default"
+@use 'base';
+
+:root {
+  color-scheme: light;
+  --fg: #343b58;
+  --bg: #d5d6db;
+  --accent: #34548a;
+  --border: #c4c8da;
+  --quote-fg: #6c6e75;
+  --quote-border: #c4c8da;
+  --table-stripe: rgba(52, 59, 88, 0.05);
+  --inline-code-bg: rgba(52, 59, 88, 0.08);
+}

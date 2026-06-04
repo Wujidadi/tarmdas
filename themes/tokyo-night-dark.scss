@@ -1,0 +1,14 @@
+// Tokyo Night Dark 主題。搭配 highlight.js "tokyo-night-dark" 與 Mermaid "dark"
+@use 'base';
+
+:root {
+  color-scheme: dark;
+  --fg: #a9b1d6;
+  --bg: #1a1b26;
+  --accent: #7aa2f7;
+  --border: #2f3549;
+  --quote-fg: #565f89;
+  --quote-border: #2f3549;
+  --table-stripe: rgba(169, 177, 214, 0.05);
+  --inline-code-bg: rgba(122, 162, 247, 0.15);
+}

@@ -1,0 +1,14 @@
+// Solarized Light 主題。搭配 highlight.js "base16/solarized-light" 與 Mermaid "default"
+@use 'base';
+
+:root {
+  color-scheme: light;
+  --fg: #586e75;
+  --bg: #fdf6e3;
+  --accent: #268bd2;
+  --border: #eee8d5;
+  --quote-fg: #93a1a1;
+  --quote-border: #eee8d5;
+  --table-stripe: rgba(101, 123, 131, 0.08);
+  --inline-code-bg: #eee8d5;
+}

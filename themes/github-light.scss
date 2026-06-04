@@ -1,0 +1,7 @@
+// GitHub 淺色主題。搭配 highlight.js "github" 與 Mermaid "default"
+@use 'base';
+@use 'github-palette' as gh;
+
+:root {
+  @include gh.light;
+}

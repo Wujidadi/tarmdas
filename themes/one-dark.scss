@@ -1,0 +1,14 @@
+// One Dark 主題。搭配 highlight.js "atom-one-dark" 與 Mermaid "dark"
+@use 'base';
+
+:root {
+  color-scheme: dark;
+  --fg: #abb2bf;
+  --bg: #282c34;
+  --accent: #61afef;
+  --border: #3e4451;
+  --quote-fg: #7f848e;
+  --quote-border: #3e4451;
+  --table-stripe: rgba(255, 255, 255, 0.04);
+  --inline-code-bg: rgba(97, 175, 239, 0.15);
+}

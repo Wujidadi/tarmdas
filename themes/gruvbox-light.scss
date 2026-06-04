@@ -1,0 +1,14 @@
+// Gruvbox Light 主題。搭配 highlight.js "base16/gruvbox-light-medium" 與 Mermaid "default"
+@use 'base';
+
+:root {
+  color-scheme: light;
+  --fg: #3c3836;
+  --bg: #fbf1c7;
+  --accent: #076678;
+  --border: #ebdbb2;
+  --quote-fg: #7c6f64;
+  --quote-border: #ebdbb2;
+  --table-stripe: rgba(60, 56, 54, 0.05);
+  --inline-code-bg: #ebdbb2;
+}

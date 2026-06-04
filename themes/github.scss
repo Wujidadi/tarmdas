@@ -1,0 +1,15 @@
+// GitHub 自動主題：依系統 prefers-color-scheme 在淺/深之間切換
+// 程式碼配色由 highlight.js 的淺/深主題（以媒體查詢包裹）連動，
+// Mermaid 則於初始化時依系統偏好選擇主題
+@use 'base';
+@use 'github-palette' as gh;
+
+:root {
+  @include gh.light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    @include gh.dark;
+  }
+}

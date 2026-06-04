@@ -1,0 +1,14 @@
+// One Light 主題（one-dark 的淺色版）。搭配 highlight.js "atom-one-light" 與 Mermaid "default"
+@use 'base';
+
+:root {
+  color-scheme: light;
+  --fg: #383a42;
+  --bg: #fafafa;
+  --accent: #4078f2;
+  --border: #e5e5e6;
+  --quote-fg: #a0a1a7;
+  --quote-border: #e5e5e6;
+  --table-stripe: rgba(56, 58, 66, 0.05);
+  --inline-code-bg: rgba(56, 58, 66, 0.08);
+}

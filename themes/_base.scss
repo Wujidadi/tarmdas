@@ -1,0 +1,127 @@
+// 共用結構樣式（CSS 變數驅動）。各主題只需設定 :root 變數即可換色
+// 變數一覽：
+//   --fg             正文文字色
+//   --bg             頁面背景色
+//   --accent         連結/強調色
+//   --border         框線/分隔線色
+//   --quote-fg       引用文字色
+//   --quote-border   引用左側線色
+//   --table-stripe   表格隔列底色
+//   --inline-code-bg 行內程式碼底色
+// 註：程式碼區塊（pre.hljs）的底色與字色由 highlight.js 主題 CSS 提供，
+//     Mermaid 圖由其自身主題渲染，兩者皆與本主題的淺/深配對一致
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0 auto;
+  max-width: 1600px;
+  padding: 2.5rem 1.25rem 6rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--fg);
+  background: var(--bg);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.3;
+  margin: 1.8em 0 0.6em;
+  font-weight: 600;
+}
+
+h1 {
+  font-size: 2em;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid var(--border);
+}
+
+h2 {
+  font-size: 1.5em;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid var(--border);
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2em 0;
+}
+
+blockquote {
+  margin: 1em 0;
+  padding: 0 1em;
+  color: var(--quote-fg);
+  border-left: 0.25em solid var(--quote-border);
+}
+
+table {
+  border-collapse: collapse;
+  margin: 1em 0;
+  display: block;
+  overflow-x: auto;
+
+  th,
+  td {
+    border: 1px solid var(--border);
+    padding: 6px 13px;
+  }
+
+  tr:nth-child(2n) {
+    background: var(--table-stripe);
+  }
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 0.9em;
+}
+
+// 行內程式碼（非區塊）
+:not(pre) > code {
+  padding: 0.2em 0.4em;
+  background: var(--inline-code-bg);
+  border-radius: 6px;
+}
+
+// 程式碼區塊：容器外觀由本主題決定，token 配色由 highlight.js 主題提供
+pre {
+  padding: 1em;
+  overflow-x: auto;
+  border-radius: 8px;
+
+  code {
+    background: none;
+    padding: 0;
+  }
+}
+
+// Mermaid 區塊：透明底，讓頁面背景透出，交由 Mermaid 主題渲染
+pre.mermaid {
+  background: none;
+  padding: 0;
+  text-align: center;
+}
+
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.5em 0;
+}

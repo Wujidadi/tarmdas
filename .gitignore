@@ -1,0 +1,48 @@
+# 相依套件
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 範例輸出（自包含 HTML 體積大且可重新生成，請自行執行指令在本地生成）
+examples/*.html
+examples/*.assets/
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.AppleDouble
+.LSOverride
+Icon
+
+# Linux
+*~
+.directory
+.Trash-*
+.fuse_hidden*
+.nfs*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# JetBrains（IntelliJ / WebStorm 等）
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+.idea_modules/
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+.history/

@@ -1,0 +1,14 @@
+// Solarized Dark 主題。搭配 highlight.js "base16/solarized-dark" 與 Mermaid "dark"
+@use 'base';
+
+:root {
+  color-scheme: dark;
+  --fg: #93a1a1;
+  --bg: #002b36;
+  --accent: #268bd2;
+  --border: #073642;
+  --quote-fg: #586e75;
+  --quote-border: #073642;
+  --table-stripe: rgba(255, 255, 255, 0.04);
+  --inline-code-bg: #073642;
+}

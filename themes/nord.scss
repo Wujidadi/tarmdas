@@ -1,0 +1,14 @@
+// Nord 主題。搭配 highlight.js "nord" 與 Mermaid "dark"
+@use 'base';
+
+:root {
+  color-scheme: dark;
+  --fg: #d8dee9;
+  --bg: #2e3440;
+  --accent: #88c0d0;
+  --border: #434c5e;
+  --quote-fg: #7b88a1;
+  --quote-border: #434c5e;
+  --table-stripe: rgba(255, 255, 255, 0.04);
+  --inline-code-bg: rgba(136, 192, 208, 0.15);
+}

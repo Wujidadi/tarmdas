@@ -1,0 +1,25 @@
+// GitHub 風格的淺色與深色調色盤，供各主題檔以 mixin 套用，避免重複
+
+@mixin light {
+  color-scheme: light;
+  --fg: #24292f;
+  --bg: #ffffff;
+  --accent: #0969da;
+  --border: #d8dee4;
+  --quote-fg: #57606a;
+  --quote-border: #d0d7de;
+  --table-stripe: rgba(175, 184, 193, 0.2);
+  --inline-code-bg: rgba(175, 184, 193, 0.2);
+}
+
+@mixin dark {
+  color-scheme: dark;
+  --fg: #c9d1d9;
+  --bg: #0d1117;
+  --accent: #58a6ff;
+  --border: #30363d;
+  --quote-fg: #8b949e;
+  --quote-border: #30363d;
+  --table-stripe: rgba(110, 118, 129, 0.1);
+  --inline-code-bg: rgba(110, 118, 129, 0.4);
+}
