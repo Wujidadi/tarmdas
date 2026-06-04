@@ -66,7 +66,7 @@ node bin/tarmdas.js examples/sample.md --watch
 
 ### 預覽輸出
 
-上述指令會在本機產生 HTML 檔。為避免龐大的自包含檔（每個約 3.6 MB）進入版控，輸出的 `examples/*.html` 已列入 `.gitignore`、不收錄於倉庫；想看實際效果，請自行執行對應指令在本地生成，例如：
+上述指令會在本機產生 HTML 檔。為避免龐大的自包含檔（每個約 3.6 MB）進入版控，`examples/*.html` 與 `examples/themes-preview/` 皆已列入 `.gitignore`、不收錄於倉庫；想看實際效果，請自行執行對應指令在本地生成，例如：
 
 ```bash
 # 自包含單檔，依情境加後綴區別
@@ -75,6 +75,16 @@ node bin/tarmdas.js examples/sample.md -o examples/sample-github-light.html --th
 node bin/tarmdas.js examples/sample.md -o examples/sample-github-dark.html --theme github-dark
 node bin/tarmdas.js examples/sample.md -o examples/sample-light-darkcode.html --theme github-light --highlight-theme github-dark
 node bin/tarmdas.js examples/sample.md -o examples/sample-external.html --external-assets
+```
+
+也可一次產生多個主題的預覽，並列比較外觀（輸出目錄需先建立）：
+
+```bash
+mkdir -p examples/themes-preview
+for theme in xai-dark xai-light github tokyo-night-dark dracula solarized-light; do
+  node bin/tarmdas.js examples/sample.md \
+    -o "examples/themes-preview/sample-$theme.html" --theme "$theme"
+done
 ```
 
 ## 指令選項
