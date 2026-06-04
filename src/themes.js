@@ -117,12 +117,14 @@ export async function getPresetCss(name) {
  * @returns {string}
  */
 export function mermaidInitScript(mermaidTheme) {
+  // 圖表字級與正文基準字體（themes/_base.scss 的 14px）一致，避免圖表文字比正文大
+  const themeVariables = "themeVariables: { fontSize: '14px' }";
   if (mermaidTheme === 'auto') {
     return (
       "mermaid.initialize({ startOnLoad: true, theme: " +
       "(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) " +
-      "? 'dark' : 'default' });"
+      `? 'dark' : 'default', ${themeVariables} });`
     );
   }
-  return `mermaid.initialize({ startOnLoad: true, theme: ${JSON.stringify(mermaidTheme)} });`;
+  return `mermaid.initialize({ startOnLoad: true, theme: ${JSON.stringify(mermaidTheme)}, ${themeVariables} });`;
 }

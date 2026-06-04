@@ -67,6 +67,11 @@ test('mermaidInitScript：auto 依系統偏好、固定主題用指定值', () =
   assert.match(mermaidInitScript('default'), /theme: "default"/);
 });
 
+test('mermaidInitScript：圖表字級與正文基準 14px 一致', () => {
+  assert.match(mermaidInitScript('auto'), /themeVariables: \{ fontSize: '14px' \}/);
+  assert.match(mermaidInitScript('dark'), /themeVariables: \{ fontSize: '14px' \}/);
+});
+
 test('renderDocument：github-dark 連動深色正文、hljs、Mermaid', async () => {
   const dir = await tmpDir();
   const src = '# 標題\n\n```js\nconst a=1;\n```\n\n```mermaid\ngraph TD\nA-->B\n```\n';
