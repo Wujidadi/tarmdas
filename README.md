@@ -16,6 +16,7 @@ Tarmdas 把單一 Markdown 檔轉成單一、可離線開啟的 HTML 檔——�
 - **LaTeX / KaTeX**：建置期渲染數學，字型以 base64 內嵌
 - **Mermaid**：內嵌腳本於瀏覽器端渲染，不依賴 Puppeteer
 - **程式碼高亮**：highlight.js 建置期高亮
+- **GitHub Alerts**：支援 `> [!NOTE]`、`> [!IMPORTANT]` 等五種警示區塊，標記與配色與 GitHub 一致，並依主題淺/深自動切換
 - **內建主題**：GitHub、One、Gruvbox、Tokyo Night、Solarized、Monokai、Dracula、Nord 等共 14 種（多數含淺/深），正文、程式碼、Mermaid 三處配色一致
 - **自訂樣式**：支援 CSS 與 SASS / SCSS / LESS 預處理
 - **Live Reload**：可選擇性啟用；預設不啟動任何伺服器

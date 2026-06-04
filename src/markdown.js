@@ -1,8 +1,11 @@
-// markdown-it 實例組裝：程式碼高亮（highlight.js）、數學（KaTeX via texmath）、Mermaid fence
+// markdown-it 實例組裝：程式碼高亮（highlight.js）、數學（KaTeX via texmath）、
+// Mermaid fence、GitHub Alerts 警示區塊
 import MarkdownIt from 'markdown-it';
 import texmath from 'markdown-it-texmath';
 import katex from 'katex';
 import hljs from 'highlight.js';
+
+import { githubAlerts } from './alerts.js';
 
 // Mermaid 區塊以 <pre class="mermaid"> 輸出原始碼，交由瀏覽器端 mermaid.js 渲染
 function renderMermaid(md, code) {
@@ -62,6 +65,8 @@ export function createMarkdownIt(opts = {}) {
       katexOptions: { throwOnError: false, output: 'html' },
     });
   }
+
+  md.use(githubAlerts);
 
   return md;
 }

@@ -72,6 +72,41 @@ blockquote {
   border-left: 0.25em solid var(--quote-border);
 }
 
+// GitHub Alerts 警示區塊（> [!NOTE] 等五種）。各類型專屬色取自 GitHub，
+// 以 light-dark() 依主題的 color-scheme 自動切換淺/深
+.markdown-alert {
+  margin: 1em 0;
+  padding: 0.5em 1em;
+  border-left: 0.25em solid var(--alert-accent);
+
+  > :first-child {
+    margin-top: 0;
+  }
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+
+  .markdown-alert-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    font-weight: 600;
+    color: var(--alert-accent);
+
+    .octicon {
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+  }
+
+  &.markdown-alert-note      { --alert-accent: light-dark(#0969da, #4493f8); }
+  &.markdown-alert-tip       { --alert-accent: light-dark(#1a7f37, #3fb950); }
+  &.markdown-alert-important { --alert-accent: light-dark(#8250df, #ab7df8); }
+  &.markdown-alert-warning   { --alert-accent: light-dark(#9a6700, #d29922); }
+  &.markdown-alert-caution   { --alert-accent: light-dark(#cf222e, #f85149); }
+}
+
 table {
   border-collapse: collapse;
   margin: 1em 0;
