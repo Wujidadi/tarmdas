@@ -10,6 +10,10 @@
 // - 高亮
 // - 上標/下標
 // - Emoji 短碼
+// - 縮寫
+// - 插入/底線
+// - 自訂容器
+// - 目錄（TOC）
 import MarkdownIt from 'markdown-it';
 import texmath from 'markdown-it-texmath';
 import footnote from 'markdown-it-footnote';
@@ -18,12 +22,28 @@ import mark from 'markdown-it-mark';
 import sub from 'markdown-it-sub';
 import sup from 'markdown-it-sup';
 import { full as emoji } from 'markdown-it-emoji';
+import abbr from 'markdown-it-abbr';
+import ins from 'markdown-it-ins';
+import container from 'markdown-it-container';
 import katex from 'katex';
 import hljs from 'highlight.js';
 
 import { githubAlerts } from './alerts.js';
 import { taskLists } from './tasklists.js';
 import { headingAnchors } from './anchors.js';
+import { tableOfContents } from './toc.js';
+
+// 自訂容器 :::name：接受任意名稱，輸出 <div class="custom-block custom-block-<name>">，供使用者以自訂 CSS 針對性設定樣式
+function customContainer(md) {
+  md.use(container, 'custom', {
+    validate: () => true,
+    render(tokens, idx) {
+      if (tokens[idx].nesting !== 1) return '</div>\n';
+      const name = (tokens[idx].info.trim().split(/\s+/)[0] || 'block').replace(/[^\w-]/g, '');
+      return `<div class="custom-block custom-block-${name}">\n`;
+    },
+  });
+}
 
 // Mermaid 區塊以 <pre class="mermaid"> 輸出原始碼，交由瀏覽器端 mermaid.js 渲染
 function renderMermaid(md, code) {
@@ -94,7 +114,11 @@ export function createMarkdownIt(opts = {}) {
   md.use(sub);
   md.use(sup);
   md.use(emoji);
+  md.use(abbr);
+  md.use(ins);
+  md.use(customContainer);
   md.use(headingAnchors);
+  md.use(tableOfContents); // 須在 headingAnchors 之後，目錄連結才能對上標題 id
 
   return md;
 }

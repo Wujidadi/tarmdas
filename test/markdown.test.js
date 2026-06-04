@@ -129,3 +129,32 @@ test('Emoji：短碼轉為 Unicode 字元', () => {
   assert.ok(html.includes('🚀'), ':rocket: 應轉為火箭');
   assert.ok(!html.includes(':rocket:'), '短碼不應殘留');
 });
+
+test('縮寫：*[ABBR]: 定義使內文出現 abbr', () => {
+  const { html } = renderMarkdown('*[HTML]: HyperText Markup Language\n\nHTML 很實用\n');
+  assert.ok(html.includes('<abbr title="HyperText Markup Language">HTML</abbr>'));
+});
+
+test('插入：++text++ 轉為 ins', () => {
+  const { html } = renderMarkdown('這是 ++新增++ 內容\n');
+  assert.ok(html.includes('<ins>新增</ins>'));
+});
+
+test('自訂容器：:::name 轉為帶 custom-block 類別的 div，內容仍解析', () => {
+  const { html } = renderMarkdown(':::tip 提示\n容器內 **粗體**\n:::\n');
+  assert.ok(html.includes('<div class="custom-block custom-block-tip">'));
+  assert.ok(html.includes('<strong>粗體</strong>'), '容器內 Markdown 仍應解析');
+});
+
+test('TOC：[[toc]] 替換為巢狀目錄，連結對應標題 id', () => {
+  const { html } = renderMarkdown('[[toc]]\n\n# 安裝\n## 需求\n# 使用\n');
+  assert.ok(html.includes('class="table-of-contents"'), '應產生目錄');
+  assert.ok(html.includes('<a href="#安裝">安裝</a>'), '目錄連結應對應標題 id');
+  assert.ok(html.includes('<a href="#需求">需求</a>'));
+  assert.ok(!html.includes('[[toc]]'), '佔位標記不應殘留');
+});
+
+test('TOC：無 [[toc]] 標記時不產生目錄', () => {
+  const { html } = renderMarkdown('# 安裝\n內文\n');
+  assert.ok(!html.includes('table-of-contents'));
+});

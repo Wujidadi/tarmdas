@@ -20,7 +20,7 @@ test('按需內嵌：純文字不含 KaTeX/Mermaid 資產', async () => {
   assert.equal(features.mermaid, false);
   assert.ok(!html.includes('data:font/woff2'), '不應內嵌字型');
   assert.ok(!html.includes('mermaid.initialize'), '不應含 mermaid');
-  assert.ok(html.length < 5000, `純文字輸出應精簡，實際 ${html.length}`);
+  assert.ok(html.length < 6000, `純文字輸出應精簡，實際 ${html.length}`);
 });
 
 test('KaTeX：含數學時內嵌字型與 katex 樣式', async () => {

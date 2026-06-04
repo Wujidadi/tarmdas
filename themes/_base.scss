@@ -219,3 +219,43 @@ dt {
 dd {
   margin: 0.2em 0 0 1.5em;
 }
+
+// 縮寫：虛線底線並以 help 游標提示有說明
+abbr[title] {
+  cursor: help;
+  text-decoration: underline dotted;
+}
+
+// 自訂容器 :::name：預設給予柔和的左側邊線外觀，使用者可依 custom-block-<name> 覆寫
+.custom-block {
+  margin: 1em 0;
+  padding: 0.5em 1em;
+  border-left: 0.25em solid var(--border);
+  border-radius: 0 6px 6px 0;
+
+  > :first-child {
+    margin-top: 0;
+  }
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+}
+
+// 目錄（TOC）：方框內含巢狀清單，字級略小
+.table-of-contents {
+  margin: 1.5em 0;
+  padding: 0.5em 1.2em;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.95em;
+
+  ul {
+    margin: 0.3em 0;
+    padding-left: 1.4em;
+  }
+
+  li {
+    margin: 0.2em 0;
+  }
+}
