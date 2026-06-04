@@ -16,11 +16,15 @@ test('按需內嵌：純文字不含 KaTeX/Mermaid 資產', async () => {
     baseDir: dir,
     outputPath: path.join(dir, 'out.html'),
   });
-  assert.equal(features.math, false);
-  assert.equal(features.mermaid, false);
+  // 直接檢查「未偵測到、也未內嵌任何按需資產」，而非以總長度間接推估
+  assert.equal(features.math, false, '不應偵測到數學');
+  assert.equal(features.mermaid, false, '不應偵測到 Mermaid');
+  assert.equal(features.code, false, '不應偵測到程式碼高亮');
   assert.ok(!html.includes('data:font/woff2'), '不應內嵌字型');
-  assert.ok(!html.includes('mermaid.initialize'), '不應含 mermaid');
-  assert.ok(html.length < 6000, `純文字輸出應精簡，實際 ${html.length}`);
+  assert.ok(!html.includes('mermaid.initialize'), '不應含 Mermaid 腳本');
+  // 寬鬆上限僅作為「誤嵌重量級資產」的最後防線：基底 CSS 正常成長不會觸及，
+  // 但字型（數百 KB）、Mermaid（數 MB）等大型內嵌都會遠超此值而被攔下
+  assert.ok(html.length < 50_000, `純文字輸出不應內嵌重量級資產，實際 ${html.length}`);
 });
 
 test('KaTeX：含數學時內嵌字型與 katex 樣式', async () => {
