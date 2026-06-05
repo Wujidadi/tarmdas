@@ -24,6 +24,7 @@ Tarmdas 把單一 Markdown 檔轉成單一、可離線開啟的 HTML 檔——�
 - **目錄**：於文件中放置 `[[toc]]`（或 `[toc]`）即生成依標題層級巢狀、連結對應錨點的目錄
 - **內建主題**：GitHub、One、Gruvbox、Tokyo Night、Solarized、Monokai、Dracula、Nord、xAI 等共 17 種（多數含淺/深），正文、程式碼、Mermaid 三處配色一致
 - **自訂樣式**：支援 CSS 與 SASS / SCSS / LESS 預處理
+- **配置檔**：可於文件專案目錄放置 `tarmdas.config.json` 設定常用選項（主題、頁寬、字級等），免去每次帶旗標
 - **Live Reload**：可選擇性啟用；預設不啟動任何伺服器
 - **輕量**：CLI、開發伺服器、檔案監看皆使用 Node.js 內建能力，無重量級框架
 
@@ -96,6 +97,8 @@ done
 | `--max-inline-size <n>`    | inline 模式媒體內嵌上限，支援 k/m/g 後綴（預設 5m）       |
 | `--theme <name>`           | 文件主題，共 17 種（預設 github，完整清單見〈內建主題〉） |
 | `--highlight-theme <name>` | 覆寫程式碼配色（任一 highlight.js 主題）                  |
+| `--max-width <w>`          | 頁面內文最大寬度，純數字視為 px（預設 1600px）            |
+| `--font-size <s>`          | 正文基準字級，純數字視為 px（預設 14px）                  |
 | `--title <text>`           | 文件標題（預設取 front-matter 或首個 H1）                 |
 | `--breaks`                 | 段落內單一換行渲染為 `<br>`（預設視為空格）               |
 | `--no-math`                | 停用 KaTeX                                                |
@@ -105,6 +108,29 @@ done
 | `--port <n>`               | 開發伺服器埠號（預設 4321）                               |
 | `-h, --help`               | 顯示說明                                                  |
 | `-v, --version`            | 顯示版本                                                  |
+
+## 配置檔
+
+頁面寬度、字級、主題等個人偏好不必每次帶旗標，可在文件專案目錄放置 `tarmdas.config.json` 統一設定。
+轉檔時會自輸入檔所在目錄向上逐層尋找，取第一個找到的配置檔；優先序為「內建預設 < 配置檔 < CLI 旗標」，旗標永遠可臨時覆寫。
+
+```json
+{
+  "theme": "github-dark",
+  "css": ["./style/extra.scss"],
+  "maxWidth": "1400px",
+  "fontSize": 15,
+  "breaks": true
+}
+```
+
+- 欄位名稱為對應 CLI 長旗標的 camelCase 形式，可用欄位：
+  `theme`、`highlightTheme`、`css`、`externalAssets`、`maxInlineSize`、`maxWidth`、`fontSize`、`breaks`、`math`、`mermaid`、`highlight`、`port`
+- `maxWidth` 與 `fontSize` 接受任意 CSS 長度（如 `90ch`、`1.05rem`），純數字視為 px；圖表（Mermaid）字級會跟隨 `fontSize`
+- `math`、`mermaid`、`highlight` 為布林值，設為 `false` 等同 `--no-math` 等旗標
+- `css` 可為字串或陣列，相對路徑以配置檔所在目錄為基準解析
+- `title`、`output` 這類每次轉檔各異的選項不開放於配置檔設定
+- 配置檔屬個人偏好，建議在你的文件專案中將其加入 `.gitignore`、不納入版控
 
 ## 內建主題
 

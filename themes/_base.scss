@@ -8,6 +8,9 @@
 //   --quote-border   引用左側線色
 //   --table-stripe   表格隔列底色
 //   --inline-code-bg 行內程式碼底色
+// 版面變數（主題不設定，由配置檔 tarmdas.config.json 或 CLI 旗標經 :root 覆寫注入）：
+//   --page-max-width 頁面內文最大寬度（預設 1600px）
+//   --base-font-size 正文基準字級（預設 14px）
 // 註：程式碼區塊（pre.hljs）的底色與字色由 highlight.js 主題 CSS 提供，
 //     Mermaid 圖由其自身主題渲染，兩者皆與本主題的淺/深配對一致
 
@@ -17,10 +20,10 @@
 
 body {
   margin: 0 auto;
-  max-width: 1600px;
+  max-width: var(--page-max-width, 1600px);
   padding: 2.5rem 1.25rem 6rem;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', Helvetica, Arial, sans-serif;
-  font-size: 14px;
+  font-size: var(--base-font-size, 14px);
   line-height: 1.7;
   color: var(--fg);
   background: var(--bg);

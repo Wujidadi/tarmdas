@@ -27,7 +27,8 @@ Tarmdas 是本地、完全離線的 Markdown → 單一 HTML 轉換工具（非�
 | 檔案               | 職責                                                                                                 |
 | ------------------ | ---------------------------------------------------------------------------------------------------- |
 | `bin/tarmdas.js`   | CLI 進入點（shebang），呼叫 `src/cli.js` 的 `run()`                                                  |
-| `src/cli.js`       | 以內建 parseArgs 解析旗標，調度一次性轉檔或 watch 模式                                               |
+| `src/cli.js`       | 以內建 parseArgs 解析旗標，合併配置檔後調度一次性轉檔或 watch 模式                                   |
+| `src/config.js`    | 專案層級配置檔載入：自輸入檔目錄向上尋找 tarmdas.config.json，作為選項預設值（旗標可覆寫）           |
 | `src/convert.js`   | 核心管線：`renderDocument()` 與 `convertFile()`，組裝完整文件                                        |
 | `src/markdown.js`  | markdown-it 實例與外掛（texmath/KaTeX、highlight.js、Mermaid fence），並回報文件實際用到的功能       |
 | `src/alerts.js`    | GitHub Alerts 警示區塊外掛，將 `> [!NOTE]` 等五種標記的引用轉為帶圖示的警示區塊                      |

@@ -67,9 +67,10 @@ test('mermaidInitScript：auto 依系統偏好、固定主題用指定值', () =
   assert.match(mermaidInitScript('default'), /theme: "default"/);
 });
 
-test('mermaidInitScript：圖表字級與正文基準 14px 一致', () => {
-  assert.match(mermaidInitScript('auto'), /themeVariables: \{ fontSize: '14px' \}/);
-  assert.match(mermaidInitScript('dark'), /themeVariables: \{ fontSize: '14px' \}/);
+test('mermaidInitScript：圖表字級預設與正文基準 14px 一致，並可跟隨配置字級', () => {
+  assert.match(mermaidInitScript('auto'), /themeVariables: \{ fontSize: "14px" \}/);
+  assert.match(mermaidInitScript('dark'), /themeVariables: \{ fontSize: "14px" \}/);
+  assert.match(mermaidInitScript('dark', '15px'), /themeVariables: \{ fontSize: "15px" \}/);
 });
 
 test('renderDocument：github-dark 連動深色正文、hljs、Mermaid', async () => {

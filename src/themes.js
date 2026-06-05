@@ -129,11 +129,12 @@ export async function getPresetCss(name) {
 /**
  * 產生 Mermaid 初始化腳本（auto 主題會在執行期依系統偏好選色）
  * @param {string} mermaidTheme 'auto' 或固定 Mermaid 主題名
+ * @param {string} [fontSize]   圖表字級（預設同 themes/_base.scss 的基準字級 14px）
  * @returns {string}
  */
-export function mermaidInitScript(mermaidTheme) {
-  // 圖表字級與正文基準字體（themes/_base.scss 的 14px）一致，避免圖表文字比正文大
-  const themeVariables = "themeVariables: { fontSize: '14px' }";
+export function mermaidInitScript(mermaidTheme, fontSize = '14px') {
+  // 圖表字級與正文基準字體一致，避免圖表文字比正文大
+  const themeVariables = `themeVariables: { fontSize: ${JSON.stringify(fontSize)} }`;
   if (mermaidTheme === 'auto') {
     return (
       "mermaid.initialize({ startOnLoad: true, theme: " +

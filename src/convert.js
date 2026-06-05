@@ -32,6 +32,12 @@ function stripTags(html) {
   return html.replace(/<[^>]+>/g, '').trim();
 }
 
+// 正規化 CSS 長度：純數字視為 px，其餘（任意 CSS 長度單位）原樣輸出
+export function cssLength(value) {
+  const s = String(value).trim();
+  return /^\d+(\.\d+)?$/.test(s) ? `${s}px` : s;
+}
+
 function resolveTitle({ explicit, frontMatter, bodyHtml, fallback }) {
   if (explicit) return explicit;
   if (frontMatter.title) return frontMatter.title;
@@ -52,6 +58,8 @@ function resolveTitle({ explicit, frontMatter, bodyHtml, fallback }) {
  * @param {number} [opts.maxInlineSize]         inline 模式媒體內嵌上限（位元組）
  * @param {string} [opts.theme='github']        文件主題（github / github-light / github-dark）
  * @param {string} [opts.highlightTheme]        覆寫 highlight.js 程式碼主題（預設跟隨文件主題）
+ * @param {string|number} [opts.maxWidth]       頁面內文最大寬度（純數字視為 px；預設 1600px）
+ * @param {string|number} [opts.fontSize]       正文基準字級（純數字視為 px；預設 14px）
  * @param {string} [opts.title]                 覆寫文件標題
  * @param {boolean} [opts.math=true]            啟用 KaTeX
  * @param {boolean} [opts.mermaid=true]         啟用 Mermaid
@@ -69,6 +77,8 @@ export async function renderDocument(source, opts) {
     maxInlineSize = DEFAULT_MAX_INLINE_SIZE,
     theme = DEFAULT_PRESET,
     highlightTheme,
+    maxWidth,
+    fontSize,
     title: explicitTitle,
     math = true,
     mermaid = true,
@@ -100,6 +110,11 @@ export async function renderDocument(source, opts) {
   const preset = getPreset(theme); // 驗證主題並取得連動設定
   const styles = [];
   styles.push(await getPresetCss(theme)); // 正文主題（淺/深）
+  // 版面覆寫：以 :root 變數蓋過 _base.scss 預設，仍可被後續的使用者樣式覆寫
+  const layout = [];
+  if (maxWidth != null) layout.push(`--page-max-width: ${cssLength(maxWidth)};`);
+  if (fontSize != null) layout.push(`--base-font-size: ${cssLength(fontSize)};`);
+  if (layout.length) styles.push(`:root {\n  ${layout.join('\n  ')}\n}`);
   if (useCode) {
     // 程式碼主題：使用者覆寫 > 主題的固定/自動設定
     if (highlightTheme) {
@@ -117,7 +132,8 @@ export async function renderDocument(source, opts) {
   const scripts = [];
   if (useMermaid) {
     scripts.push(await getMermaidJs());
-    scripts.push(mermaidInitScript(preset.mermaid));
+    // 圖表字級跟隨正文基準字級（未配置時由 mermaidInitScript 使用預設 14px）
+    scripts.push(mermaidInitScript(preset.mermaid, fontSize != null ? cssLength(fontSize) : undefined));
   }
 
   // 4) 組裝完整文件
