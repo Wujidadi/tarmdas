@@ -1,11 +1,11 @@
-// GFM Task List（任務清單）外掛：將 `- [ ]`／`- [x]` 開頭的清單項轉為核取方塊
-// 與 GitHub 一致，核取方塊為唯讀（disabled）僅供展示，不可勾選
-// 清單容器加上 contains-task-list、項目加上 task-list-item 類別供樣式定位
+// GFM task list plugin: turns list items starting with `- [ ]` / `- [x]` into checkboxes
+// Matching GitHub, checkboxes are read-only (disabled), display-only, not clickable
+// The list container gets contains-task-list and items get task-list-item classes for styling
 
 const MARKER_RE = /^\[([ xX])\] /;
 
-// 判斷 index 處的 inline token 是否為任務清單項的內容：
-// 須為 list_item > paragraph > inline 結構，且內容首為 [ ] / [x] 標記
+// Whether the inline token at index is task-list-item content:
+// must be a list_item > paragraph > inline structure whose content starts with a [ ] / [x] marker
 function isTaskItem(tokens, index) {
   return (
     tokens[index]?.type === 'inline' &&
@@ -15,7 +15,7 @@ function isTaskItem(tokens, index) {
   );
 }
 
-// 自 index（某 list_item_open）往回找包住它的父層清單開啟 token，回傳其索引
+// From index (a list_item_open), walk back to the enclosing parent list's opening token and return its index
 function parentListOpen(tokens, index) {
   for (let i = index, depth = 0; i >= 0; i--) {
     const t = tokens[i].type;
@@ -38,7 +38,8 @@ function checkboxToken(state, checked) {
 }
 
 /**
- * markdown-it 外掛：於 inline 解析後掃描 token 流，將任務清單項改寫為核取方塊
+ * markdown-it plugin: after inline parsing, scan the token stream and rewrite
+ * task list items into checkboxes
  * @param {import('markdown-it')} md
  */
 export function taskLists(md) {
@@ -47,7 +48,7 @@ export function taskLists(md) {
     for (let i = 2; i < tokens.length; i++) {
       if (!isTaskItem(tokens, i)) continue;
 
-      // 與 GitHub 一致：僅無序清單（bullet list）內的項目才轉為任務清單
+      // Matching GitHub: only items inside unordered (bullet) lists become task items
       const parent = parentListOpen(tokens, i - 2);
       if (parent === -1 || tokens[parent].type !== 'bullet_list_open') continue;
 
@@ -55,15 +56,16 @@ export function taskLists(md) {
       const m = inline.content.match(MARKER_RE);
       const checked = m[1] !== ' ';
 
-      // 自 inline 內容與其首個文字子節點移除標記（含尾隨空白，共 4 字元）
+      // Remove the marker (with its trailing space, 4 characters total) from the inline
+      // content and its first text child
       inline.content = inline.content.slice(m[0].length);
       inline.children[0].content = inline.children[0].content.slice(m[0].length);
-      // 於子節點開頭插入核取方塊
+      // Insert the checkbox at the start of the children
       inline.children.unshift(checkboxToken(state, checked));
 
-      // 項目加上 task-list-item 類別
+      // Add the task-list-item class to the item
       tokens[i - 2].attrJoin('class', 'task-list-item');
-      // 父層清單加上 contains-task-list 類別（同一清單僅加一次）
+      // Add the contains-task-list class to the parent list (only once per list)
       if (!/\bcontains-task-list\b/.test(tokens[parent].attrGet('class') || '')) {
         tokens[parent].attrJoin('class', 'contains-task-list');
       }

@@ -1,11 +1,13 @@
-// 專案層級配置檔：自輸入檔所在目錄向上逐層尋找 tarmdas.config.json，作為選項的預設值來源（優先序：內建預設 < 配置檔 < CLI 旗標）
+// Project-level config file: search upward from the input file's directory for
+// tarmdas.config.json and use it as the source of option defaults
+// (precedence: built-in defaults < config file < CLI flags)
 import { readFile, access } from 'node:fs/promises';
 import path from 'node:path';
 
 export const CONFIG_FILENAME = 'tarmdas.config.json';
 
-// 配置檔允許的欄位（對應 CLI 長旗標的 camelCase 形式）
-// title、output 等「每次轉檔各異」的選項不開放於配置檔設定
+// Fields allowed in the config file (camelCase forms of the CLI long flags)
+// Per-conversion options such as title and output are not configurable here
 export const ALLOWED_KEYS = [
   'theme',
   'highlightTheme',
@@ -22,9 +24,9 @@ export const ALLOWED_KEYS = [
 ];
 
 /**
- * 自 startDir 向上逐層尋找配置檔，回傳第一個找到的路徑
- * @param {string} startDir 起始目錄（通常為輸入檔所在目錄）
- * @returns {Promise<string|null>} 配置檔絕對路徑，找不到則為 null
+ * Search upward from startDir level by level for a config file, returning the first path found
+ * @param {string} startDir Starting directory (usually the input file's directory)
+ * @returns {Promise<string|null>} Absolute path of the config file, or null if not found
  */
 export async function findConfig(startDir) {
   let dir = path.resolve(startDir);
@@ -34,18 +36,19 @@ export async function findConfig(startDir) {
       await access(file);
       return file;
     } catch {
-      /* 此層沒有，往上一層 */
+      /* not at this level, go one up */
     }
     const parent = path.dirname(dir);
-    if (parent === dir) return null; // 已達檔案系統根目錄
+    if (parent === dir) return null; // reached the filesystem root
     dir = parent;
   }
 }
 
 /**
- * 尋找並載入配置檔：解析 JSON、驗證欄位，並將 css 相對路徑以配置檔所在目錄為基準解析
- * @param {string} startDir 起始目錄（通常為輸入檔所在目錄）
- * @returns {Promise<{ config: object, configPath: string|null }>} 找不到配置檔時 config 為空物件
+ * Find and load the config file: parse the JSON, validate the fields, and resolve
+ * relative css paths against the config file's directory
+ * @param {string} startDir Starting directory (usually the input file's directory)
+ * @returns {Promise<{ config: object, configPath: string|null }>} config is an empty object when no config file is found
  */
 export async function loadConfig(startDir) {
   const configPath = await findConfig(startDir);
@@ -55,21 +58,22 @@ export async function loadConfig(startDir) {
   try {
     data = JSON.parse(await readFile(configPath, 'utf8'));
   } catch (err) {
-    throw new Error(`無法解析配置檔 ${configPath}：${err.message}`);
+    throw new Error(`Cannot parse config file ${configPath}: ${err.message}`);
   }
   if (data === null || typeof data !== 'object' || Array.isArray(data)) {
-    throw new Error(`配置檔 ${configPath} 的頂層必須是 JSON 物件`);
+    throw new Error(`Config file ${configPath} must have a JSON object at the top level`);
   }
 
   const unknown = Object.keys(data).filter((k) => !ALLOWED_KEYS.includes(k));
   if (unknown.length) {
     throw new Error(
-      `配置檔 ${configPath} 含未知欄位：${unknown.join('、')}\n\n可用欄位：${ALLOWED_KEYS.join(', ')}`,
+      `Config file ${configPath} contains unknown field(s): ${unknown.join(', ')}\n\nAvailable fields: ${ALLOWED_KEYS.join(', ')}`,
     );
   }
 
   const config = { ...data };
-  // css 可為單一字串或陣列；相對路徑以配置檔所在目錄為基準，與執行時的 cwd 無關
+  // css may be a single string or an array; relative paths resolve against the config
+  // file's directory, independent of the runtime cwd
   if (config.css != null) {
     const list = Array.isArray(config.css) ? config.css : [config.css];
     config.css = list.map((f) => path.resolve(path.dirname(configPath), f));

@@ -58,7 +58,7 @@ Tarmdas 是本地、完全離線的 Markdown → 單一 HTML 轉換工具（非�
 1. 在 `themes/` 建立 `<name>.scss`，以 `@use 'base'` 引入共用結構，並於 `:root` 設定調色盤變數（`--fg`、`--bg`、`--accent`、`--border`、`--quote-fg`、`--quote-border`、`--table-stripe`、`--inline-code-bg`）與 `color-scheme`。
 2. 正文的 `--bg`/`--fg` 應對應該 highlight.js 主題的實際背景/前景色，讓程式碼區塊與正文同色系吻合。
 3. 在 `src/themes.js` 的 `PRESETS` 登錄：`scss`（檔名）、`highlight`（hljs 主題名，字串為固定、物件 `{light,dark}` 為自動切換）、`mermaid`（`'default'`/`'dark'`，或 `'auto'` 依系統偏好）。
-4. 同步更新 `README.md` 的〈內建主題〉表格與 `src/cli.js` 的 `--help`。
+4. 同步更新 `README.md` 的〈Built-in themes〉表格與 `src/cli.js` 的 `--help`。
 
 註：highlight.js 未提供官方淺色版的主題（如 Monokai、Dracula、Nord）僅提供深色，不硬湊淺色版以免配色不搭。
 
@@ -70,9 +70,16 @@ Tarmdas 是本地、完全離線的 Markdown → 單一 HTML 轉換工具（非�
 
 `examples/*.html` 與 `examples/*.assets/` 為可重新生成的輸出，已列入 `.gitignore`、不收錄於倉庫；要看效果請依 `README.md` 自行於本地生成。
 
-## 標點符號規範
+## 語言與標點規範
 
-遵循全域規範：所有 Markdown 與原始碼（含註解）不得全半形標點混用；中文段落、句子中的冒號、逗號、分號、括號、句號一律全形；註解中每個段落的最後一句後面不加句號。
+為國際化及便利非中文母語者參與，本倉庫採以下語言分工：
+
+- **英文**：程式碼註解與 JSDoc、CLI 使用者面向字串（`--help`、錯誤與進度訊息）、`README.md`、`examples/`、`package.json` description、測試名稱與斷言訊息。
+- **繁體中文**：本檔（CLAUDE.md）與 `plans/`，屬內部開發紀錄。
+- 例外：`test/markdown.test.js` 的錨點 CJK slug 測試刻意保留中文標題 fixture，用以驗證 Unicode 保留行為，勿改寫為英文。
+
+標點方面：英文內容一律使用半形標點；中文文件遵循全域規範，不得全半形標點混用，中文段落、句子中的冒號、逗號、分號、括號、句號一律全形。
+無論中英文，註解中每個段落的最後一句後面不加句號。
 表格儲存格內僅用等寬的 ASCII 或中文字，不放 Emoji 或其他變寬字元以免破壞欄位對齊。
 
 ## 常用指令
@@ -87,6 +94,7 @@ npm test                                        # 單元測試
 
 ## Commit 規範
 
-1. 所有 commit message 一律使用繁體中文（台灣），並採用台灣標準翻譯與慣用術語，不得夾雜除必要訊息外的日語、韓語或其他非中文詞彙（包含感嘆句、慣用語）。
-2. 使用 [Conventional Commits](https://www.conventionalcommits.org/zh-hant/) 標準格式，以提高 commit message 的可讀性與可維護性。
+1. 所有 commit message 一律使用英文。
+2. 使用 [Conventional Commits](https://www.conventionalcommits.org/) 標準格式，以提高 commit message 的可讀性與可維護性。
 3. 若變動較多、較為複雜，應在 commit 標題之外，列出至少一項 bullet point，說明本次異動的摘要，以及各個檔案的異動原因。
+4. 本文依語義斷行（一句一行，於句意完足處換行），不依固定欄寬硬換行。

@@ -1,4 +1,4 @@
-// 核心轉檔管線：Markdown → 完整 HTML 文件（含 KaTeX、Mermaid、樣式、資產內嵌）
+// Core conversion pipeline: Markdown → complete HTML document (with KaTeX, Mermaid, styles, inlined assets)
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -16,7 +16,7 @@ import { getPreset, getPresetCss, mermaidInitScript, DEFAULT_PRESET } from './th
 
 export const DEFAULT_MAX_INLINE_SIZE = 5 * 1024 * 1024; // 5 MB
 
-// 解析（極簡）front-matter：僅支援頂部 --- 區塊內的 key: value
+// Parse (minimal) front matter: only key: value pairs inside a leading --- block
 function parseFrontMatter(source) {
   const m = source.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
   if (!m) return { data: {}, content: source };
@@ -32,7 +32,7 @@ function stripTags(html) {
   return html.replace(/<[^>]+>/g, '').trim();
 }
 
-// 正規化 CSS 長度：純數字視為 px，其餘（任意 CSS 長度單位）原樣輸出
+// Normalize a CSS length: bare numbers become px, anything else (any CSS length unit) passes through
 export function cssLength(value) {
   const s = String(value).trim();
   return /^\d+(\.\d+)?$/.test(s) ? `${s}px` : s;
@@ -42,30 +42,31 @@ function resolveTitle({ explicit, frontMatter, bodyHtml, fallback }) {
   if (explicit) return explicit;
   if (frontMatter.title) return frontMatter.title;
   const h1 = bodyHtml.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
-  // 先移除標題錨點連結（含其 # 文字），避免洩漏進標題文字
+  // Strip the heading anchor link first (including its # text) so it does not leak into the title
   if (h1) return stripTags(h1[1].replace(/<a class="header-anchor"[\s\S]*?<\/a>/i, ''));
   return fallback;
 }
 
 /**
- * 將 Markdown 原始碼轉為完整 HTML 文件字串（並依需要把超大媒體複製到旁置資產夾）
- * @param {string} source Markdown 原始碼
+ * Convert Markdown source into a complete HTML document string (copying oversized media
+ * to the sidecar asset folder when needed)
+ * @param {string} source Markdown source
  * @param {object} opts
- * @param {string} opts.baseDir                 解析相對資源的基準目錄
- * @param {string} opts.outputPath              輸出 HTML 的目標路徑（用於決定旁置資產夾位置/命名）
- * @param {string[]} [opts.css=[]]              使用者自訂樣式檔
- * @param {boolean} [opts.externalAssets=false] 改用外置資產模式
- * @param {number} [opts.maxInlineSize]         inline 模式媒體內嵌上限（位元組）
- * @param {string} [opts.theme='github']        文件主題（github / github-light / github-dark）
- * @param {string} [opts.highlightTheme]        覆寫 highlight.js 程式碼主題（預設跟隨文件主題）
- * @param {string|number} [opts.maxWidth]       頁面內文最大寬度（純數字視為 px；預設 1600px）
- * @param {string|number} [opts.fontSize]       正文基準字級（純數字視為 px；預設 14px）
- * @param {string} [opts.title]                 覆寫文件標題
- * @param {boolean} [opts.math=true]            啟用 KaTeX
- * @param {boolean} [opts.mermaid=true]         啟用 Mermaid
- * @param {boolean} [opts.highlight=true]       啟用程式碼高亮
- * @param {boolean} [opts.breaks=false]         段落內單一換行渲染為 <br>
- * @param {boolean} [opts.liveReload=false]     注入 Live Reload 腳本
+ * @param {string} opts.baseDir                 Base directory for resolving relative resources
+ * @param {string} opts.outputPath              Target path of the output HTML (determines sidecar asset folder location/name)
+ * @param {string[]} [opts.css=[]]              User-supplied stylesheets
+ * @param {boolean} [opts.externalAssets=false] Use external-asset mode instead
+ * @param {number} [opts.maxInlineSize]         Media inline-embedding limit in inline mode (bytes)
+ * @param {string} [opts.theme='github']        Document theme (github / github-light / github-dark)
+ * @param {string} [opts.highlightTheme]        Override the highlight.js code theme (defaults to following the document theme)
+ * @param {string|number} [opts.maxWidth]       Max page content width (bare number means px; default 1600px)
+ * @param {string|number} [opts.fontSize]       Base body font size (bare number means px; default 14px)
+ * @param {string} [opts.title]                 Override the document title
+ * @param {boolean} [opts.math=true]            Enable KaTeX
+ * @param {boolean} [opts.mermaid=true]         Enable Mermaid
+ * @param {boolean} [opts.highlight=true]       Enable code highlighting
+ * @param {boolean} [opts.breaks=false]         Render single newlines inside paragraphs as <br>
+ * @param {boolean} [opts.liveReload=false]     Inject the Live Reload script
  * @returns {Promise<{ html: string, title: string, features: object, media: { inlined: number, copied: string[] } }>}
  */
 export async function renderDocument(source, opts) {
@@ -89,13 +90,13 @@ export async function renderDocument(source, opts) {
 
   const { data: frontMatter, content } = parseFrontMatter(source);
 
-  // 1) Markdown → HTML 片段，並回報實際用到的功能
+  // 1) Markdown → HTML fragment, reporting which features were actually used
   const { html: rendered, features } = renderMarkdown(content, { math, highlight, breaks });
   const useMath = math && features.math;
   const useMermaid = mermaid && features.mermaid;
   const useCode = highlight && features.code;
 
-  // 2) 處理本地圖片/媒體（內嵌或旁置）
+  // 2) Process local images/media (inline or sidecar)
   const outBase = path.basename(outputPath, path.extname(outputPath));
   const assetDirName = `${outBase}.assets`;
   const { html: body, inlined, copied } = await processMedia(rendered, {
@@ -106,17 +107,18 @@ export async function renderDocument(source, opts) {
     assetHref: assetDirName,
   });
 
-  // 3) 蒐集要內嵌的樣式與腳本（按需）
-  const preset = getPreset(theme); // 驗證主題並取得連動設定
+  // 3) Collect styles and scripts to inline (on demand)
+  const preset = getPreset(theme); // validate the theme and obtain its linked settings
   const styles = [];
-  styles.push(await getPresetCss(theme)); // 正文主題（淺/深）
-  // 版面覆寫：以 :root 變數蓋過 _base.scss 預設，仍可被後續的使用者樣式覆寫
+  styles.push(await getPresetCss(theme)); // body theme (light/dark)
+  // Layout overrides: :root variables override the _base.scss defaults, and can still
+  // be overridden by user styles appended later
   const layout = [];
   if (maxWidth != null) layout.push(`--page-max-width: ${cssLength(maxWidth)};`);
   if (fontSize != null) layout.push(`--base-font-size: ${cssLength(fontSize)};`);
   if (layout.length) styles.push(`:root {\n  ${layout.join('\n  ')}\n}`);
   if (useCode) {
-    // 程式碼主題：使用者覆寫 > 主題的固定/自動設定
+    // Code theme: user override > the theme's fixed/auto setting
     if (highlightTheme) {
       styles.push(await getHighlightCss(highlightTheme));
     } else if (typeof preset.highlight === 'object') {
@@ -132,11 +134,12 @@ export async function renderDocument(source, opts) {
   const scripts = [];
   if (useMermaid) {
     scripts.push(await getMermaidJs());
-    // 圖表字級跟隨正文基準字級（未配置時由 mermaidInitScript 使用預設 14px）
+    // Diagram font size follows the base body font size (when unconfigured,
+    // mermaidInitScript falls back to its 14px default)
     scripts.push(mermaidInitScript(preset.mermaid, fontSize != null ? cssLength(fontSize) : undefined));
   }
 
-  // 4) 組裝完整文件
+  // 4) Assemble the complete document
   const title = resolveTitle({
     explicit: explicitTitle,
     frontMatter,
@@ -150,9 +153,9 @@ export async function renderDocument(source, opts) {
 }
 
 /**
- * 讀取 Markdown 檔、轉檔並寫出 HTML 檔
- * @param {string} inputPath Markdown 檔路徑
- * @param {object} [opts]    其餘選項同 renderDocument（output 指定輸出路徑）
+ * Read a Markdown file, convert it and write the HTML file
+ * @param {string} inputPath Path to the Markdown file
+ * @param {object} [opts]    Remaining options as in renderDocument (output sets the output path)
  * @returns {Promise<{ outputPath: string, title: string, features: object, media: object }>}
  */
 export async function convertFile(inputPath, opts = {}) {
@@ -168,7 +171,7 @@ export async function convertFile(inputPath, opts = {}) {
     outputPath,
   });
 
-  // 輸出目錄不存在時自動建立（含多層），避免寫檔失敗
+  // Create the output directory (including parents) when missing, so the write cannot fail
   await mkdir(path.dirname(outputPath), { recursive: true });
   await writeFile(outputPath, result.html, 'utf8');
   return { outputPath, title: result.title, features: result.features, media: result.media };

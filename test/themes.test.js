@@ -12,7 +12,7 @@ async function tmpDir() {
   return mkdtemp(path.join(tmpdir(), 'tarmdas-theme-'));
 }
 
-test('內建主題清單包含 github 三套與常見配色', () => {
+test('built-in theme list contains the three github variants and the common palettes', () => {
   const names = listPresets();
   for (const expected of [
     'github', 'github-light', 'github-dark',
@@ -20,84 +20,84 @@ test('內建主題清單包含 github 三套與常見配色', () => {
     'gruvbox-light', 'gruvbox-dark', 'tokyo-night-light', 'tokyo-night-dark',
     'solarized-light', 'solarized-dark',
   ]) {
-    assert.ok(names.includes(expected), `應包含主題 ${expected}`);
+    assert.ok(names.includes(expected), `should include theme ${expected}`);
   }
 });
 
-test('每個內建主題：SCSS 可編譯且 highlight.js 主題可解析', async () => {
+test('every built-in theme: SCSS compiles and the highlight.js theme resolves', async () => {
   for (const [name, preset] of Object.entries(PRESETS)) {
     const css = await getPresetCss(name);
-    assert.ok(/--fg:/.test(css), `${name} 應產生正文變數`);
+    assert.ok(/--fg:/.test(css), `${name} should emit the body variables`);
     const hl = typeof preset.highlight === 'object'
       ? [preset.highlight.light, preset.highlight.dark]
       : [preset.highlight];
     for (const theme of hl) {
       const themeCss = await getHighlightCss(theme);
-      assert.ok(themeCss.length > 0, `${name} 的 hljs 主題 ${theme} 應可載入`);
+      assert.ok(themeCss.length > 0, `${name}'s hljs theme ${theme} should load`);
     }
   }
 });
 
-test('getPreset 對未知主題拋出含清單的錯誤', () => {
-  assert.throws(() => getPreset('nope'), /可用主題：github/);
+test('getPreset throws an error listing the available themes for unknown names', () => {
+  assert.throws(() => getPreset('nope'), /Available themes: github/);
 });
 
-test('github-light 編譯出淺色正文變數', async () => {
+test('github-light compiles light body variables', async () => {
   const css = await getPresetCss('github-light');
-  assert.ok(css.includes('--fg: #24292f'), '應為淺色文字');
+  assert.ok(css.includes('--fg: #24292f'), 'should use light text color');
   assert.ok(css.includes('color-scheme: light'));
 });
 
-test('github-dark 編譯出深色正文變數', async () => {
+test('github-dark compiles dark body variables', async () => {
   const css = await getPresetCss('github-dark');
-  assert.ok(css.includes('--fg: #c9d1d9'), '應為深色文字');
+  assert.ok(css.includes('--fg: #c9d1d9'), 'should use dark text color');
   assert.ok(css.includes('color-scheme: dark'));
 });
 
-test('github（自動）同時含淺色預設與深色媒體查詢', async () => {
+test('github (auto) contains both the light default and the dark media query', async () => {
   const css = await getPresetCss('github');
   assert.ok(css.includes('--fg: #24292f'));
   assert.ok(css.includes('prefers-color-scheme: dark'));
   assert.ok(css.includes('--fg: #c9d1d9'));
 });
 
-test('mermaidInitScript：auto 依系統偏好、固定主題用指定值', () => {
+test('mermaidInitScript: auto follows the system preference, fixed themes use the given value', () => {
   assert.match(mermaidInitScript('auto'), /matchMedia[\s\S]*'dark' : 'default'/);
   assert.match(mermaidInitScript('dark'), /theme: "dark"/);
   assert.match(mermaidInitScript('default'), /theme: "default"/);
 });
 
-test('mermaidInitScript：圖表字級預設與正文基準 14px 一致，並可跟隨配置字級', () => {
+test('mermaidInitScript: diagram font size defaults to the 14px body base and follows the configured size', () => {
   assert.match(mermaidInitScript('auto'), /themeVariables: \{ fontSize: "14px" \}/);
   assert.match(mermaidInitScript('dark'), /themeVariables: \{ fontSize: "14px" \}/);
   assert.match(mermaidInitScript('dark', '15px'), /themeVariables: \{ fontSize: "15px" \}/);
 });
 
-test('renderDocument：github-dark 連動深色正文、hljs、Mermaid', async () => {
+test('renderDocument: github-dark links dark body, hljs and Mermaid together', async () => {
   const dir = await tmpDir();
-  const src = '# 標題\n\n```js\nconst a=1;\n```\n\n```mermaid\ngraph TD\nA-->B\n```\n';
+  const src = '# Title\n\n```js\nconst a=1;\n```\n\n```mermaid\ngraph TD\nA-->B\n```\n';
   const { html } = await renderDocument(src, {
     baseDir: dir,
     outputPath: path.join(dir, 'out.html'),
     theme: 'github-dark',
   });
-  assert.ok(html.includes('--fg: #c9d1d9'), '正文深色');
-  assert.ok(html.includes('theme: "dark"'), 'Mermaid 深色');
-  assert.ok(!html.includes('prefers-color-scheme'), '固定深色不應有媒體查詢');
+  assert.ok(html.includes('--fg: #c9d1d9'), 'dark body');
+  assert.ok(html.includes('theme: "dark"'), 'dark Mermaid');
+  assert.ok(!html.includes('prefers-color-scheme'), 'fixed dark theme should have no media query');
 });
 
-test('renderDocument：預設 github 為自動切換', async () => {
+test('renderDocument: the default github theme auto-switches', async () => {
   const dir = await tmpDir();
   const src = '```mermaid\ngraph TD\nA-->B\n```\n';
   const { html } = await renderDocument(src, {
     baseDir: dir,
     outputPath: path.join(dir, 'out.html'),
   });
-  assert.ok(html.includes('prefers-color-scheme: dark'), '自動主題含媒體查詢');
-  assert.ok(html.includes('matchMedia'), 'Mermaid 依系統偏好');
+  assert.ok(html.includes('prefers-color-scheme: dark'), 'auto theme contains the media query');
+  assert.ok(html.includes('matchMedia'), 'Mermaid follows the system preference');
 });
 
-test('highlightTheme 覆寫文件主題的程式碼配色', async () => {
+test('highlightTheme overrides the document theme code colors', async () => {
   const dir = await tmpDir();
   const src = '```js\nconst a=1;\n```\n';
   const { html } = await renderDocument(src, {
@@ -106,6 +106,6 @@ test('highlightTheme 覆寫文件主題的程式碼配色', async () => {
     theme: 'github-light',
     highlightTheme: 'github-dark',
   });
-  // 覆寫為 github-dark：固定主題，不應產生淺/深媒體查詢切換
-  assert.ok(!html.includes('prefers-color-scheme'), '覆寫後為固定 hljs 主題');
+  // Overridden to github-dark: a fixed theme, so no light/dark media-query switching
+  assert.ok(!html.includes('prefers-color-scheme'), 'override yields a fixed hljs theme');
 });

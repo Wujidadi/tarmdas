@@ -1,16 +1,16 @@
-// 使用者自訂樣式編譯：依副檔名選擇 SASS/SCSS、LESS 或原生 CSS
-// sass / less 為選用依賴，僅在實際用到時才動態載入
+// User stylesheet compilation: pick SASS/SCSS, LESS or plain CSS by file extension
+// sass / less are optional dependencies, dynamically imported only when actually used
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 async function compileScss(file) {
   let sass;
   try {
-    // 使用命名空間匯入（sass 已棄用 default 匯入）
+    // Use a namespace import (sass has deprecated the default import)
     sass = await import('sass');
   } catch {
     throw new Error(
-      `處理 ${path.basename(file)} 需要 "sass" 套件，請先安裝：npm install sass`,
+      `Processing ${path.basename(file)} requires the "sass" package, install it first: npm install sass`,
     );
   }
   const result = await sass.compileAsync(file, { style: 'expanded', loadPaths: [path.dirname(file)] });
@@ -23,7 +23,7 @@ async function compileLess(file) {
     less = (await import('less')).default ?? (await import('less'));
   } catch {
     throw new Error(
-      `處理 ${path.basename(file)} 需要 "less" 套件，請先安裝：npm install less`,
+      `Processing ${path.basename(file)} requires the "less" package, install it first: npm install less`,
     );
   }
   const input = await readFile(file, 'utf8');
@@ -32,8 +32,8 @@ async function compileLess(file) {
 }
 
 /**
- * 編譯單一樣式檔為 CSS 字串
- * @param {string} file 樣式檔路徑（.css/.scss/.sass/.less）
+ * Compile a single stylesheet into a CSS string
+ * @param {string} file Stylesheet path (.css/.scss/.sass/.less)
  * @returns {Promise<string>}
  */
 export async function compileStyle(file) {
@@ -47,12 +47,12 @@ export async function compileStyle(file) {
     case '.css':
       return readFile(file, 'utf8');
     default:
-      throw new Error(`不支援的樣式副檔名：${ext}（支援 .css/.scss/.sass/.less）`);
+      throw new Error(`Unsupported stylesheet extension: ${ext} (supported: .css/.scss/.sass/.less)`);
   }
 }
 
 /**
- * 編譯多個使用者樣式檔並串接為單一 CSS 字串
+ * Compile multiple user stylesheets and concatenate them into a single CSS string
  * @param {string[]} files
  * @returns {Promise<string>}
  */

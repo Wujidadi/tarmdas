@@ -1,8 +1,11 @@
-// 標題錨點外掛：為各級標題產生 GitHub 風格的 slug id，並插入可點擊的錨點連結
-// slug 規則：去除前後空白、轉小寫、移除標點符號、空白轉連字號，保留中日韓等 Unicode 文字
-// 同名標題以 -1、-2 ……去重，使每個 id 在文件內唯一，供頁內跳轉與目錄連結使用
+// Heading anchor plugin: generates GitHub-style slug ids for headings at every level
+// and inserts a clickable anchor link
+// Slug rules: trim, lowercase, strip punctuation, spaces to hyphens, keeping Unicode
+// letters such as CJK
+// Duplicate headings are deduplicated with -1, -2, ... so every id is unique within
+// the document, for in-page jumps and TOC links
 
-// 由標題文字產生 slug：保留字母、數字、空白與連字號，其餘一律移除
+// Build a slug from heading text: keep letters, digits, spaces and hyphens, drop everything else
 function slugify(text) {
   return text
     .trim()
@@ -13,12 +16,13 @@ function slugify(text) {
 
 function anchorToken(state, slug) {
   const token = new state.Token('html_inline', '', 0);
-  token.content = `<a class="header-anchor" href="#${slug}" aria-label="此標題的永久連結">#</a>`;
+  token.content = `<a class="header-anchor" href="#${slug}" aria-label="Permalink to this heading">#</a>`;
   return token;
 }
 
 /**
- * markdown-it 外掛：於 core 處理鏈尾端掃描標題 token，補上唯一 id 與錨點連結
+ * markdown-it plugin: at the end of the core chain, scan heading tokens and add
+ * a unique id plus an anchor link
  * @param {import('markdown-it')} md
  */
 export function headingAnchors(md) {
@@ -30,14 +34,16 @@ export function headingAnchors(md) {
       const inline = tokens[i + 1];
       if (inline?.type !== 'inline') continue;
 
-      // 以標題純文字產生 slug，空標題退回 section；同名則加序號去重
+      // Slug from the heading's plain text, falling back to "section" for empty
+      // headings; duplicates get a numeric suffix
       const base = slugify(inline.content) || 'section';
       let slug = base;
       for (let n = 1; taken.has(slug); n++) slug = `${base}-${n}`;
       taken.add(slug);
 
       tokens[i].attrSet('id', slug);
-      // 將錨點連結插為標題第一個子節點（不更動 inline.content，保留純文字供日後目錄使用）
+      // Insert the anchor link as the heading's first child (inline.content stays
+      // untouched, keeping the plain text available for the TOC later)
       inline.children.unshift(anchorToken(state, slug));
     }
   });

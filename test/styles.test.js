@@ -14,37 +14,37 @@ async function tmpFile(name, content) {
   return file;
 }
 
-test('原生 CSS 直接讀取', async () => {
+test('plain CSS is read as is', async () => {
   const file = await tmpFile('a.css', 'body{color:red}');
   assert.equal(await compileStyle(file), 'body{color:red}');
 });
 
-test('SCSS 編譯巢狀與變數', async () => {
+test('SCSS compiles nesting and variables', async () => {
   const file = await tmpFile('a.scss', '$c:#d6336c;\nbody{h1{color:$c}}');
   const css = await compileStyle(file);
   assert.ok(css.includes('#d6336c'));
-  assert.ok(css.includes('body h1'), '巢狀應展開');
+  assert.ok(css.includes('body h1'), 'nesting should be expanded');
 });
 
-test('LESS 編譯變數', async () => {
+test('LESS compiles variables', async () => {
   const file = await tmpFile('a.less', '@c:#1c7ed6; body h2{color:@c}');
   const css = await compileStyle(file);
   assert.ok(css.includes('#1c7ed6'));
 });
 
-test('不支援的副檔名拋錯', async () => {
+test('unsupported extensions throw', async () => {
   const file = await tmpFile('a.styl', 'x');
-  await assert.rejects(() => compileStyle(file), /不支援的樣式副檔名/);
+  await assert.rejects(() => compileStyle(file), /Unsupported stylesheet extension/);
 });
 
-test('compileStyles 串接多檔', async () => {
+test('compileStyles concatenates multiple files', async () => {
   const a = await tmpFile('a.css', '.a{}');
   const b = await tmpFile('b.css', '.b{}');
   const css = await compileStyles([a, b]);
   assert.ok(css.includes('.a{}') && css.includes('.b{}'));
 });
 
-test('parseSize 支援 k/m/g 後綴', () => {
+test('parseSize supports k/m/g suffixes', () => {
   assert.equal(parseSize('1024'), 1024);
   assert.equal(parseSize('5m'), 5 * 1024 * 1024);
   assert.equal(parseSize('512k'), 512 * 1024);

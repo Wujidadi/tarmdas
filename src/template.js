@@ -1,19 +1,19 @@
-// HTML 文件組裝：骨架、內嵌 CSS/JS，以及 watch 模式的 Live Reload 客戶端腳本
-// 正文樣式由主題提供（見 src/themes.js），透過 styles 傳入
+// HTML document assembly: skeleton, inlined CSS/JS, and the Live Reload client script for watch mode
+// Body styling comes from the theme (see src/themes.js), passed in via styles
 
-// 將多段 CSS 包進 <style>
+// Wrap multiple CSS chunks in a <style>
 function styleTag(cssParts) {
   const css = cssParts.filter(Boolean).join('\n');
   return css ? `<style>\n${css}\n</style>` : '';
 }
 
-// 將多段 JS 包進 <script>
+// Wrap multiple JS chunks in a <script>
 function scriptTag(jsParts) {
   const js = jsParts.filter(Boolean).join('\n');
   return js ? `<script>\n${js}\n</script>` : '';
 }
 
-// Live Reload 客戶端：監聽 SSE，收到 reload 事件即重新整理
+// Live Reload client: listen on SSE and refresh on a reload event
 const LIVE_RELOAD_SCRIPT = `
 (function () {
   try {
@@ -28,14 +28,14 @@ function escapeHtml(s) {
 }
 
 /**
- * 組裝完整 HTML 文件
+ * Assemble the complete HTML document
  * @param {object} opts
- * @param {string} opts.title               文件標題
- * @param {string} opts.body                已渲染並處理過資產的 HTML 片段
- * @param {string[]} [opts.styles]          要內嵌的 CSS（主題、hljs、KaTeX、使用者 CSS）
- * @param {string[]} [opts.scripts]         要內嵌的額外 JS（Mermaid 等）
- * @param {boolean} [opts.liveReload=false] 是否注入 Live Reload 腳本
- * @param {string} [opts.lang='zh-Hant']    HTML lang 屬性
+ * @param {string} opts.title               Document title
+ * @param {string} opts.body                Rendered, asset-processed HTML fragment
+ * @param {string[]} [opts.styles]          CSS to inline (theme, hljs, KaTeX, user CSS)
+ * @param {string[]} [opts.scripts]         Extra JS to inline (Mermaid, etc.)
+ * @param {boolean} [opts.liveReload=false] Whether to inject the Live Reload script
+ * @param {string} [opts.lang='en']         HTML lang attribute
  * @returns {string}
  */
 export function buildHtml(opts) {
@@ -45,7 +45,7 @@ export function buildHtml(opts) {
     styles = [],
     scripts = [],
     liveReload = false,
-    lang = 'zh-Hant',
+    lang = 'en',
   } = opts;
 
   const head = [

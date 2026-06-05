@@ -1,6 +1,8 @@
-// GitHub Alerts（GFM 警示區塊）外掛：將首行獨佔 [!NOTE] 等五種標記的
-// 引用區塊轉為 div.markdown-alert，標題列含對應的 Octicon 圖示與類型名稱
-// 標記未獨佔首行（同行還有其他文字）時維持一般 blockquote，行為與 GitHub 一致
+// GitHub Alerts (GFM alert blocks) plugin: rewrites blockquotes whose first line is
+// exactly one of the five [!NOTE]-style markers into div.markdown-alert, with a title
+// row containing the matching Octicon icon and type name
+// When the marker does not own the first line (other text follows on the same line),
+// the blockquote is left as is, matching GitHub's behavior
 
 const MARKER_RE = /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\][ \t]*(?:\n|$)/i;
 
@@ -12,7 +14,7 @@ const TITLES = {
   caution: 'Caution',
 };
 
-// 各類型的 Octicon 圖示路徑（16x16，與 GitHub 實際輸出相同）
+// Octicon icon paths per type (16x16, identical to GitHub's actual output)
 const ICON_PATHS = {
   note: 'M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z',
   tip: 'M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z',
@@ -31,8 +33,8 @@ function titleHtml(type) {
 }
 
 /**
- * markdown-it 外掛：於 block 解析後、inline 解析前掃描 token 流，
- * 將符合標記的 blockquote 改寫為警示區塊
+ * markdown-it plugin: after block parsing, before inline parsing, scan the token
+ * stream and rewrite marker-matching blockquotes into alert blocks
  * @param {import('markdown-it')} md
  */
 export function githubAlerts(md) {
@@ -40,14 +42,14 @@ export function githubAlerts(md) {
     const tokens = state.tokens;
     for (let i = 0; i < tokens.length; i++) {
       if (tokens[i].type !== 'blockquote_open') continue;
-      // 引用內第一個區塊須為段落，且段落首行恰為警示標記
+      // The first block inside the quote must be a paragraph whose first line is exactly the alert marker
       if (tokens[i + 1]?.type !== 'paragraph_open') continue;
       const inline = tokens[i + 2];
       if (inline?.type !== 'inline') continue;
       const m = inline.content.match(MARKER_RE);
       if (!m) continue;
 
-      // 找到同層級的 blockquote_close
+      // Find the blockquote_close at the same nesting level
       let close = -1;
       for (let j = i + 3, depth = 1; j < tokens.length; j++) {
         if (tokens[j].type === 'blockquote_open') depth++;
@@ -63,13 +65,14 @@ export function githubAlerts(md) {
       tokens[i].attrJoin('class', `markdown-alert markdown-alert-${type}`);
       tokens[close].tag = 'div';
 
-      // 自首段移除標記行；若該段僅含標記則整段移除
+      // Remove the marker line from the first paragraph; drop the whole paragraph
+      // if it contained only the marker
       inline.content = inline.content.slice(m[0].length);
       if (inline.content === '') {
         tokens.splice(i + 1, 3);
       }
 
-      // 於區塊開頭插入標題列
+      // Insert the title row at the start of the block
       const title = new state.Token('html_block', '', 0);
       title.block = true;
       title.content = titleHtml(type);

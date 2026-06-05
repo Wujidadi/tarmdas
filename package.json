@@ -1,7 +1,7 @@
 {
   "name": "tarmdas",
   "version": "0.1.0",
-  "description": "本地、完全離線的 Markdown → 單一 HTML 轉換工具（支援 KaTeX、Mermaid、SCSS/LESS、Live Reload）",
+  "description": "Local, fully offline Markdown to single-HTML converter (KaTeX, Mermaid, SCSS/LESS, Live Reload)",
   "type": "module",
   "bin": {
     "tarmdas": "bin/tarmdas.js"

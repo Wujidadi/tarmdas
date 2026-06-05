@@ -1,5 +1,6 @@
-// x.ai 風格調色盤：近純黑底、柔藍灰白字、夕陽橙強調，供深/淺主題共用
-// 色值取自 x.ai 首頁的 CSS 變數（jet/dove/sunset/umbra/fog/ivory）
+// x.ai-style palette: near-black background, soft blue-gray-white text, sunset-orange
+// accent, shared by the dark/light themes
+// Color values taken from the CSS variables on the x.ai homepage (jet/dove/sunset/umbra/fog/ivory)
 
 @mixin light {
   color-scheme: light;
@@ -27,8 +28,9 @@
   --code-bg: #121212;
 }
 
-// x.ai 特有質感：程式碼字型優先 Geist Mono；程式碼區塊底色壓回中性近黑，
-// 以較高選擇器權重（pre.hljs）覆蓋 highlight.js 主題自帶的偏藍底色
+// x.ai-specific texture: code font prefers Geist Mono; the code block background is
+// pulled back to a neutral near-black, using a higher-specificity selector (pre.hljs)
+// to override the bluish background bundled with the highlight.js theme
 @mixin chrome {
   code {
     font-family: 'Geist Mono', ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;

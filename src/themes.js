@@ -1,4 +1,5 @@
-// 內建文件主題：打包正文 SCSS、highlight.js 程式碼主題與 Mermaid 主題，三者淺/深一致
+// Built-in document themes: each bundles the body SCSS, a highlight.js code theme
+// and a Mermaid theme, keeping all three consistent across light/dark
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
@@ -7,10 +8,12 @@ import { compileStyle } from './styles.js';
 const THEMES_DIR = fileURLToPath(new URL('../themes/', import.meta.url));
 
 /**
- * 主題定義：
- *   scss      — themes/ 下的正文樣式檔
- *   highlight — highlight.js 主題：字串為固定主題；物件 { light, dark } 表示依系統自動切換
- *   mermaid   — Mermaid 主題：'auto' 表示初始化時依系統偏好選擇，否則為固定主題名
+ * Theme definition:
+ *   scss      — body stylesheet under themes/
+ *   highlight — highlight.js theme: a string means fixed; an object { light, dark }
+ *               means auto-switching with the system preference
+ *   mermaid   — Mermaid theme: 'auto' picks by system preference at init time,
+ *               otherwise a fixed theme name
  */
 export const PRESETS = {
   github: {
@@ -110,15 +113,15 @@ export function getPreset(name) {
   const preset = PRESETS[name];
   if (!preset) {
     throw new Error(
-      `未知的主題 "${name}"\n\n可用主題：${listPresets().join(', ')}`,
+      `Unknown theme "${name}"\n\nAvailable themes: ${listPresets().join(', ')}`,
     );
   }
   return preset;
 }
 
 /**
- * 編譯指定主題的正文 CSS
- * @param {string} name 主題名稱
+ * Compile the body CSS of the given theme
+ * @param {string} name Theme name
  * @returns {Promise<string>}
  */
 export async function getPresetCss(name) {
@@ -127,13 +130,14 @@ export async function getPresetCss(name) {
 }
 
 /**
- * 產生 Mermaid 初始化腳本（auto 主題會在執行期依系統偏好選色）
- * @param {string} mermaidTheme 'auto' 或固定 Mermaid 主題名
- * @param {string} [fontSize]   圖表字級（預設同 themes/_base.scss 的基準字級 14px）
+ * Build the Mermaid initialization script (the auto theme picks colors at runtime
+ * based on the system preference)
+ * @param {string} mermaidTheme 'auto' or a fixed Mermaid theme name
+ * @param {string} [fontSize]   Diagram font size (defaults to the 14px base size of themes/_base.scss)
  * @returns {string}
  */
 export function mermaidInitScript(mermaidTheme, fontSize = '14px') {
-  // 圖表字級與正文基準字體一致，避免圖表文字比正文大
+  // Diagram font size matches the base body font, so diagram text is not larger than prose
   const themeVariables = `themeVariables: { fontSize: ${JSON.stringify(fontSize)} }`;
   if (mermaidTheme === 'auto') {
     return (

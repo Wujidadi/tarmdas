@@ -1,18 +1,21 @@
-// 共用結構樣式（CSS 變數驅動）。各主題只需設定 :root 變數即可換色
-// 變數一覽：
-//   --fg             正文文字色
-//   --bg             頁面背景色
-//   --accent         連結/強調色
-//   --border         框線/分隔線色
-//   --quote-fg       引用文字色
-//   --quote-border   引用左側線色
-//   --table-stripe   表格隔列底色
-//   --inline-code-bg 行內程式碼底色
-// 版面變數（主題不設定，由配置檔 tarmdas.config.json 或 CLI 旗標經 :root 覆寫注入）：
-//   --page-max-width 頁面內文最大寬度（預設 1600px）
-//   --base-font-size 正文基準字級（預設 14px）
-// 註：程式碼區塊（pre.hljs）的底色與字色由 highlight.js 主題 CSS 提供，
-//     Mermaid 圖由其自身主題渲染，兩者皆與本主題的淺/深配對一致
+// Shared structural styles (driven by CSS variables). A theme only needs to set
+// :root variables to recolor
+// Variable overview:
+//   --fg             body text color
+//   --bg             page background color
+//   --accent         link/accent color
+//   --border         border/divider color
+//   --quote-fg       quote text color
+//   --quote-border   quote left-border color
+//   --table-stripe   table stripe background
+//   --inline-code-bg inline code background
+// Layout variables (not set by themes; injected via :root overrides from the
+// tarmdas.config.json config file or CLI flags):
+//   --page-max-width max page content width (default 1600px)
+//   --base-font-size base body font size (default 14px)
+// Note: code block (pre.hljs) background and text colors come from the highlight.js
+//       theme CSS, and Mermaid diagrams are rendered by their own theme; both are
+//       paired with this theme's light/dark variant
 
 * {
   box-sizing: border-box;
@@ -35,7 +38,8 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   position: relative;
 
-  // 標題錨點：預設隱藏，滑入標題（或聚焦連結）時於左側淡入，不擠動標題文字
+  // Heading anchor: hidden by default, fades in on the left when hovering the heading
+  // (or focusing the link), without shifting the heading text
   .header-anchor {
     position: absolute;
     left: -0.85em;
@@ -92,8 +96,8 @@ blockquote {
   border-left: 0.25em solid var(--quote-border);
 }
 
-// GitHub Alerts 警示區塊（> [!NOTE] 等五種）。各類型專屬色取自 GitHub，
-// 以 light-dark() 依主題的 color-scheme 自動切換淺/深
+// GitHub Alerts (the five > [!NOTE]-style blocks). Per-type colors come from GitHub,
+// switching light/dark automatically via light-dark() based on the theme's color-scheme
 .markdown-alert {
   margin: 1em 0;
   padding: 0.5em 1em;
@@ -127,7 +131,9 @@ blockquote {
   &.markdown-alert-caution   { --alert-accent: light-dark(#cf222e, #f85149); }
 }
 
-// GFM 任務清單：僅任務項移除項目符號，核取方塊以負左邊距落在清單縮排處，與一般清單項並存時文字仍對齊（沿用 GitHub 作法）
+// GFM task lists: only task items drop their bullet; the checkbox sits at the list
+// indent via a negative left margin, so text stays aligned when mixed with regular
+// items (same approach as GitHub)
 .task-list-item {
   list-style-type: none;
 }
@@ -159,14 +165,14 @@ code {
   font-size: 0.9em;
 }
 
-// 行內程式碼（非區塊）
+// Inline code (not in blocks)
 :not(pre) > code {
   padding: 0.2em 0.4em;
   background: var(--inline-code-bg);
   border-radius: 6px;
 }
 
-// 程式碼區塊：容器外觀由本主題決定，token 配色由 highlight.js 主題提供
+// Code blocks: container chrome comes from this theme, token colors from the highlight.js theme
 pre {
   padding: 1em;
   overflow-x: auto;
@@ -178,7 +184,7 @@ pre {
   }
 }
 
-// Mermaid 區塊：透明底，讓頁面背景透出，交由 Mermaid 主題渲染
+// Mermaid blocks: transparent background so the page shows through, rendering left to the Mermaid theme
 pre.mermaid {
   background: none;
   padding: 0;
@@ -191,7 +197,8 @@ pre.mermaid {
   padding: 0.5em 0;
 }
 
-// 腳註：底部以分隔線（hr.footnotes-sep 沿用上方 hr 樣式）區隔，內文字級略小、色彩較淡
+// Footnotes: separated at the bottom by a divider (hr.footnotes-sep reuses the hr style
+// above), with slightly smaller and dimmer text
 .footnotes {
   font-size: 0.875em;
   color: var(--quote-fg);
@@ -205,7 +212,7 @@ pre.mermaid {
   text-decoration: none;
 }
 
-// 高亮標記 ==text==：以柔和螢光底色標示，依主題 color-scheme 自動切換淺/深
+// Mark ==text==: a soft highlighter background, switching light/dark with the theme's color-scheme
 mark {
   padding: 0.05em 0.2em;
   border-radius: 3px;
@@ -213,7 +220,7 @@ mark {
   background: light-dark(#fff3a3, #5e560f);
 }
 
-// 定義清單：詞條粗體，定義縮排
+// Definition lists: bold terms, indented definitions
 dt {
   margin-top: 0.8em;
   font-weight: 600;
@@ -223,13 +230,14 @@ dd {
   margin: 0.2em 0 0 1.5em;
 }
 
-// 縮寫：虛線底線並以 help 游標提示有說明
+// Abbreviations: dotted underline with a help cursor hinting at the tooltip
 abbr[title] {
   cursor: help;
   text-decoration: underline dotted;
 }
 
-// 自訂容器 :::name：預設給予柔和的左側邊線外觀，使用者可依 custom-block-<name> 覆寫
+// Custom containers :::name — a soft left-border look by default, overridable per
+// custom-block-<name> by the user
 .custom-block {
   margin: 1em 0;
   padding: 0.5em 1em;
@@ -245,7 +253,7 @@ abbr[title] {
   }
 }
 
-// 目錄（TOC）：方框內含巢狀清單，字級略小
+// Table of contents (TOC): a boxed nested list with slightly smaller text
 .table-of-contents {
   margin: 1.5em 0;
   padding: 0.5em 1.2em;

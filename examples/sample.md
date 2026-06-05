@@ -1,100 +1,100 @@
 ---
-title: Tarmdas 功能示範
+title: Tarmdas Feature Showcase
 ---
 
-# Tarmdas 功能示範
+# Tarmdas Feature Showcase
 
-這是一份涵蓋全部功能的示範文件，用來驗證離線轉檔結果
-每個標題滑入時左側會浮現可點擊的錨點（`#`），下方目錄也會連到對應段落
+This document exercises every feature, to verify the offline conversion result.
+Hover any heading to reveal a clickable anchor (`#`) on the left; the table of contents below also links to each section.
 
-## 目錄
+## Table of Contents
 
 [[toc]]
 
-## 文字與清單
+## Text and Lists
 
-- 支援 **粗體**、_斜體_、`行內程式碼`、~~刪除線~~
-- 支援 [連結](https://example.com) 與裸網址自動連結 https://example.com
-- 巢狀清單
-  1. 第一項
-  2. 第二項
+- Supports **bold**, _italic_, `inline code`, ~~strikethrough~~
+- Supports [links](https://example.com) and bare-URL autolinking https://example.com
+- Nested lists
+  1. First item
+  2. Second item
 
-> 區塊引用：完全離線、單一 HTML 檔
+> Blockquote: fully offline, single HTML file
 
-## 任務清單
+## Task Lists
 
-- [x] 已完成的項目
-- [x] 支援大小寫 `[X]`
-- [ ] 尚未完成的項目
-- [ ] 巢狀任務
-  - [x] 子任務（已完成）
-  - [ ] 子任務（未完成）
+- [x] A completed item
+- [x] Uppercase `[X]` is supported
+- [ ] A pending item
+- [ ] Nested tasks
+  - [x] Subtask (done)
+  - [ ] Subtask (pending)
 
-## 延伸行內語法
+## Extended Inline Syntax
 
-- 高亮標示：這是 ==需要強調的重點==
-- 上標與下標：面積 = πr^2^、水分子 H~2~O、二氧化碳 CO~2~
-- 插入內容：這段是 ++後來新增的文字++
-- 縮寫（游標移上去看說明）：HTML 與 CSS 是網頁的基礎
-- Emoji 短碼：建置完成 :rocket: 測試通過 :white_check_mark: 慶祝一下 :tada:
+- Mark: this is ==a point worth emphasizing==
+- Superscript and subscript: area = πr^2^, water H~2~O, carbon dioxide CO~2~
+- Insert: this part was ++added later++
+- Abbreviations (hover for the tooltip): HTML and CSS are the foundation of the web
+- Emoji shortcodes: build done :rocket: tests pass :white_check_mark: celebrate :tada:
 
 *[HTML]: HyperText Markup Language
 *[CSS]: Cascading Style Sheets
 
-## 定義清單
+## Definition Lists
 
 Markdown
-: 一種輕量級標記語言，以純文字撰寫、可轉為 HTML
+: A lightweight markup language, written as plain text and convertible to HTML
 
 Tarmdas
-: 本地、完全離線的 Markdown 轉單一 HTML 工具
+: A local, fully offline Markdown to single-HTML converter
 
-## 腳註
+## Footnotes
 
-正文中可加入腳註參照[^1]，也支援具名腳註[^offline]，內容會匯整到頁面底部
+Body text can reference footnotes[^1], named footnotes work too[^offline]; their content is collected at the bottom of the page.
 
-[^1]: 這是第一個腳註的內容
+[^1]: This is the first footnote's content
 
-[^offline]: Tarmdas 產出的單檔可用 `file://` 直接離線開啟
+[^offline]: A file produced by Tarmdas opens offline directly via `file://`
 
-## 警示區塊（GitHub Alerts）
+## Alert Blocks (GitHub Alerts)
 
 > [!NOTE]
-> 一般補充說明
+> General supplementary information
 
 > [!TIP]
-> 建議採用的做法或小撇步
+> A recommended approach or handy trick
 
 > [!IMPORTANT]
-> 重要事項，請務必閱讀
+> Important information, please read carefully
 
 > [!WARNING]
-> 警告：可能造成非預期結果
+> Warning: may cause unexpected results
 
 > [!CAUTION]
-> 危險操作，後果自負
+> Dangerous operation, proceed at your own risk
 
-## 自訂容器
+## Custom Containers
 
-自訂容器會輸出帶 `custom-block-<名稱>` 類別的區塊，可用 `--css` 針對性設定樣式：
+Custom containers emit a block with a `custom-block-<name>` class, which you can style via `--css`:
 
-:::tip 小提示
-容器內仍可使用 **粗體**、`行內程式碼` 等一般 Markdown 語法
+:::tip Hint
+Regular Markdown such as **bold** and `inline code` still works inside containers
 :::
 
-:::details 補充細節
-適合放置可選讀的延伸說明
+:::details More details
+A good place for optional, skippable elaboration
 :::
 
-## 表格
+## Tables
 
-| 功能     | 狀態 |
-| -------- | ---- |
-| Markdown | OK   |
-| KaTeX    | OK   |
-| Mermaid  | OK   |
+| Feature  | Status |
+| -------- | ------ |
+| Markdown | OK     |
+| KaTeX    | OK     |
+| Mermaid  | OK     |
 
-## 程式碼高亮
+## Code Highlighting
 
 ```js
 function greet(name) {
@@ -108,34 +108,34 @@ def add(a, b):
     return a + b
 ```
 
-## 數學（KaTeX）
+## Math (KaTeX)
 
-行內數學：質能等價 $E = mc^2$
+Inline math: mass-energy equivalence $E = mc^2$
 
-區塊數學：
+Block math:
 
 $$
 \int_{-\infty}^{\infty} e^{-x^2}\,dx = \sqrt{\pi}
 $$
 
-## Mermaid 圖
+## Mermaid Diagram
 
 ```mermaid
 graph TD
   A[Markdown] --> B[markdown-it]
-  B --> C{功能}
+  B --> C{Features}
   C --> D[KaTeX]
   C --> E[Mermaid]
   C --> F[highlight.js]
-  D & E & F --> G[單一 HTML]
+  D & E & F --> G[Single HTML]
 ```
 
-## 圖片
+## Images
 
-向量圖（SVG，內聯）：
+Vector (SVG, inlined):
 
 ![Tarmdas Logo](logo.svg)
 
-點陣圖（PNG，Base64 內嵌）：
+Raster (PNG, Base64-embedded):
 
-![紅點](dot.png)
+![Red dot](dot.png)

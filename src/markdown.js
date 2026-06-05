@@ -1,19 +1,19 @@
-// markdown-it 實例組裝：
-// - 程式碼高亮（highlight.js）
-// - 數學（KaTeX via texmath）
-// - Mermaid fence
-// - GitHub Alerts 警示區塊
-// - GFM 任務清單
-// - 腳註
-// - 標題錨點
-// - 定義清單
-// - 高亮
-// - 上標/下標
-// - Emoji 短碼
-// - 縮寫
-// - 插入/底線
-// - 自訂容器
-// - 目錄（TOC）
+// markdown-it instance assembly:
+// - code highlighting (highlight.js)
+// - math (KaTeX via texmath)
+// - Mermaid fences
+// - GitHub Alerts
+// - GFM task lists
+// - footnotes
+// - heading anchors
+// - definition lists
+// - mark (highlighting)
+// - superscript/subscript
+// - emoji shortcodes
+// - abbreviations
+// - insert/underline
+// - custom containers
+// - table of contents (TOC)
 import MarkdownIt from 'markdown-it';
 import texmath from 'markdown-it-texmath';
 import footnote from 'markdown-it-footnote';
@@ -33,7 +33,8 @@ import { taskLists } from './tasklists.js';
 import { headingAnchors } from './anchors.js';
 import { tableOfContents } from './toc.js';
 
-// 自訂容器 :::name：接受任意名稱，輸出 <div class="custom-block custom-block-<name>">，供使用者以自訂 CSS 針對性設定樣式
+// Custom container :::name — accepts any name and emits
+// <div class="custom-block custom-block-<name>"> so users can target it with custom CSS
 function customContainer(md) {
   md.use(container, 'custom', {
     validate: () => true,
@@ -45,12 +46,13 @@ function customContainer(md) {
   });
 }
 
-// Mermaid 區塊以 <pre class="mermaid"> 輸出原始碼，交由瀏覽器端 mermaid.js 渲染
+// Mermaid blocks emit the raw source as <pre class="mermaid">, rendered by mermaid.js in the browser
 function renderMermaid(md, code) {
   return `<pre class="mermaid">${md.utils.escapeHtml(code)}</pre>`;
 }
 
-// 程式碼高亮：回傳完整 <pre>，markdown-it 偵測到開頭為 <pre 便不再包一層
+// Code highlighting: return a complete <pre>; markdown-it skips its own wrapper
+// when the output starts with <pre
 function highlight(md, str, lang) {
   if (lang === 'mermaid') {
     return renderMermaid(md, str);
@@ -60,18 +62,18 @@ function highlight(md, str, lang) {
       const out = hljs.highlight(str, { language: lang, ignoreIllegals: true }).value;
       return `<pre class="hljs"><code class="language-${lang}">${out}</code></pre>`;
     } catch {
-      /* 落到下方預設處理 */
+      /* fall through to the default handling below */
     }
   }
   return `<pre class="hljs"><code>${md.utils.escapeHtml(str)}</code></pre>`;
 }
 
 /**
- * 建立並設定 markdown-it 實例
+ * Create and configure a markdown-it instance
  * @param {object} [opts]
- * @param {boolean} [opts.math=true]      啟用 KaTeX
- * @param {boolean} [opts.highlight=true] 啟用程式碼高亮
- * @param {boolean} [opts.breaks=false]   段落內單一換行渲染為 <br>
+ * @param {boolean} [opts.math=true]      Enable KaTeX
+ * @param {boolean} [opts.highlight=true] Enable code highlighting
+ * @param {boolean} [opts.breaks=false]   Render single newlines inside paragraphs as <br>
  * @returns {MarkdownIt}
  */
 export function createMarkdownIt(opts = {}) {
@@ -85,7 +87,7 @@ export function createMarkdownIt(opts = {}) {
     highlight: useHighlight ? (str, lang) => highlight(md, str, lang) : undefined,
   });
 
-  // 未啟用高亮時，仍需攔截 mermaid fence
+  // Even with highlighting disabled, mermaid fences still need to be intercepted
   if (!useHighlight) {
     const defaultFence = md.renderer.rules.fence.bind(md.renderer.rules);
     md.renderer.rules.fence = (tokens, idx, options, env, self) => {
@@ -118,15 +120,16 @@ export function createMarkdownIt(opts = {}) {
   md.use(ins);
   md.use(customContainer);
   md.use(headingAnchors);
-  md.use(tableOfContents); // 須在 headingAnchors 之後，目錄連結才能對上標題 id
+  md.use(tableOfContents); // must come after headingAnchors so TOC links match heading ids
 
   return md;
 }
 
 /**
- * 渲染 Markdown 文字為 HTML 片段，並回報實際使用到的功能（供按需內嵌資產）
- * @param {string} source Markdown 原始碼
- * @param {object} [opts] 傳給 createMarkdownIt 的選項
+ * Render Markdown text into an HTML fragment, reporting which features were actually
+ * used (for on-demand asset inlining)
+ * @param {string} source Markdown source
+ * @param {object} [opts] Options forwarded to createMarkdownIt
  * @returns {{ html: string, features: { math: boolean, mermaid: boolean, code: boolean } }}
  */
 export function renderMarkdown(source, opts = {}) {

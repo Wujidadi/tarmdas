@@ -1,4 +1,4 @@
-// Live Reload 開發伺服器：node:http 供出產物 + fs.watch 監看來源 + SSE 推送重載
+// Live Reload dev server: node:http serves the output + fs.watch watches sources + SSE pushes reloads
 import http from 'node:http';
 import { watch as fsWatch } from 'node:fs';
 import { readFile, stat } from 'node:fs/promises';
@@ -29,9 +29,9 @@ function contentType(file) {
 }
 
 /**
- * 啟動 Live Reload 開發伺服器。會持續執行直到行程結束
- * @param {string} input     Markdown 檔路徑
- * @param {object} [options] 轉檔選項（同 convertFile），外加 port
+ * Start the Live Reload dev server. Keeps running until the process exits
+ * @param {string} input     Path to the Markdown file
+ * @param {object} [options] Conversion options (as in convertFile), plus port
  */
 export async function startWatch(input, options = {}) {
   const port = options.port ?? 4321;
@@ -47,17 +47,17 @@ export async function startWatch(input, options = {}) {
   async function build() {
     try {
       const r = await convertFile(absInput, convertOpts);
-      process.stdout.write(`[tarmdas] 已重建 ${path.relative(process.cwd(), r.outputPath)}\n`);
+      process.stdout.write(`[tarmdas] Rebuilt ${path.relative(process.cwd(), r.outputPath)}\n`);
       return true;
     } catch (err) {
-      process.stderr.write(`[tarmdas] 轉檔失敗：${err.message}\n`);
+      process.stderr.write(`[tarmdas] Conversion failed: ${err.message}\n`);
       return false;
     }
   }
 
   await build();
 
-  // SSE 客戶端集合
+  // Set of SSE clients
   const clients = new Set();
   function notifyReload() {
     for (const res of clients) res.write('event: reload\ndata: 1\n\n');
@@ -78,10 +78,10 @@ export async function startWatch(input, options = {}) {
       return;
     }
 
-    // 將 '/' 對應到產出 HTML，其餘對應到輸出目錄下的檔案（旁置資產）
+    // Map '/' to the output HTML, everything else to files under the output directory (sidecar assets)
     const relPath = url === '/' ? outName : url.replace(/^\/+/, '');
     const filePath = path.join(outDir, relPath);
-    // 防止路徑跳脫輸出目錄
+    // Prevent paths from escaping the output directory
     if (!filePath.startsWith(outDir)) {
       res.writeHead(403).end('Forbidden');
       return;
@@ -98,7 +98,7 @@ export async function startWatch(input, options = {}) {
     }
   });
 
-  // 監看來源：Markdown 與使用者樣式檔（去抖）
+  // Watch the sources: the Markdown file and user stylesheets (debounced)
   let timer = null;
   const onChange = () => {
     clearTimeout(timer);
@@ -111,13 +111,13 @@ export async function startWatch(input, options = {}) {
     try {
       watchers.push(fsWatch(path.resolve(css), onChange));
     } catch {
-      /* 樣式檔可能尚不存在，略過 */
+      /* the stylesheet may not exist yet, skip it */
     }
   }
 
   await new Promise((resolve) => server.listen(port, resolve));
   process.stdout.write(
-    `[tarmdas] 開發伺服器啟動：http://localhost:${port}/ （監看 ${path.basename(absInput)}，Ctrl+C 結束）\n`,
+    `[tarmdas] Dev server running: http://localhost:${port}/ (watching ${path.basename(absInput)}, Ctrl+C to stop)\n`,
   );
 
   const shutdown = () => {

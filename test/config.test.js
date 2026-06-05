@@ -18,29 +18,29 @@ async function tmpProject(config, sub = '') {
   return { root, dir };
 }
 
-test('findConfig 於同層找到配置檔', async () => {
+test('findConfig finds the config file at the same level', async () => {
   const { root, dir } = await tmpProject({});
   assert.equal(await findConfig(dir), path.join(root, CONFIG_FILENAME));
 });
 
-test('findConfig 自子目錄向上尋找', async () => {
+test('findConfig searches upward from a subdirectory', async () => {
   const { root, dir } = await tmpProject({}, 'docs/guide');
   assert.equal(await findConfig(dir), path.join(root, CONFIG_FILENAME));
 });
 
-test('findConfig 找不到時回傳 null（深層暫存目錄無配置檔）', async () => {
+test('findConfig returns null when nothing is found (deep temp dir without a config file)', async () => {
   const { dir } = await tmpProject(null, 'docs');
   assert.equal(await findConfig(dir), null);
 });
 
-test('loadConfig 找不到配置檔時回傳空物件', async () => {
+test('loadConfig returns an empty object when no config file is found', async () => {
   const { dir } = await tmpProject(null, 'docs');
   const { config, configPath } = await loadConfig(dir);
   assert.deepEqual(config, {});
   assert.equal(configPath, null);
 });
 
-test('loadConfig 讀取欄位', async () => {
+test('loadConfig reads the fields', async () => {
   const { dir } = await tmpProject({ theme: 'github-dark', maxWidth: '1400px', fontSize: 15, breaks: true });
   const { config } = await loadConfig(dir);
   assert.equal(config.theme, 'github-dark');
@@ -49,28 +49,28 @@ test('loadConfig 讀取欄位', async () => {
   assert.equal(config.breaks, true);
 });
 
-test('loadConfig 將 css 字串正規化為陣列並以配置檔目錄解析相對路徑', async () => {
+test('loadConfig normalizes a css string into an array, resolving relative paths against the config dir', async () => {
   const { root, dir } = await tmpProject({ css: './style/extra.scss' }, 'docs');
   const { config } = await loadConfig(dir);
   assert.deepEqual(config.css, [path.join(root, 'style', 'extra.scss')]);
 });
 
-test('loadConfig 對未知欄位拋錯', async () => {
+test('loadConfig throws on unknown fields', async () => {
   const { dir } = await tmpProject({ them: 'github-dark' });
-  await assert.rejects(() => loadConfig(dir), /未知欄位：them/);
+  await assert.rejects(() => loadConfig(dir), /unknown field\(s\): them/);
 });
 
-test('loadConfig 對非法 JSON 拋錯', async () => {
+test('loadConfig throws on invalid JSON', async () => {
   const { dir } = await tmpProject('{ theme: ');
-  await assert.rejects(() => loadConfig(dir), /無法解析配置檔/);
+  await assert.rejects(() => loadConfig(dir), /Cannot parse config file/);
 });
 
-test('loadConfig 對非物件頂層拋錯', async () => {
+test('loadConfig throws when the top level is not an object', async () => {
   const { dir } = await tmpProject('["github"]');
-  await assert.rejects(() => loadConfig(dir), /頂層必須是 JSON 物件/);
+  await assert.rejects(() => loadConfig(dir), /JSON object at the top level/);
 });
 
-test('cssLength 純數字補 px、其餘原樣', () => {
+test('cssLength appends px to bare numbers and passes everything else through', () => {
   assert.equal(cssLength(1400), '1400px');
   assert.equal(cssLength('15'), '15px');
   assert.equal(cssLength('0.9'), '0.9px');

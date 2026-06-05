@@ -1,4 +1,4 @@
-// GitHub 風格的淺色與深色調色盤，供各主題檔以 mixin 套用，避免重複
+// GitHub-style light and dark palettes, applied by theme files as mixins to avoid duplication
 
 @mixin light {
   color-scheme: light;
