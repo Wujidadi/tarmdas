@@ -74,6 +74,9 @@ Body text can reference footnotes[^1], named footnotes work too[^offline]; their
 > [!CAUTION]
 > Dangerous operation, proceed at your own risk
 
+> [!DATE]
+> 2026-06-06 — a non-standard type for highlighting a date or timestamp
+
 ## Custom Containers
 
 Custom containers emit a block with a `custom-block-<name>` class, which you can style via `--css`:

@@ -1,10 +1,12 @@
 // GitHub Alerts (GFM alert blocks) plugin: rewrites blockquotes whose first line is
-// exactly one of the five [!NOTE]-style markers into div.markdown-alert, with a title
+// exactly one of the [!NOTE]-style markers into div.markdown-alert, with a title
 // row containing the matching Octicon icon and type name
+// Besides GitHub's five standard markers, a non-standard [!DATE] type is supported for
+// highlighting a date or timestamp block, rendered in a neutral gray accent
 // When the marker does not own the first line (other text follows on the same line),
 // the blockquote is left as is, matching GitHub's behavior
 
-const MARKER_RE = /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\][ \t]*(?:\n|$)/i;
+const MARKER_RE = /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION|DATE)\][ \t]*(?:\n|$)/i;
 
 const TITLES = {
   note: 'Note',
@@ -12,6 +14,7 @@ const TITLES = {
   important: 'Important',
   warning: 'Warning',
   caution: 'Caution',
+  date: 'Date',
 };
 
 // Octicon icon paths per type (16x16, identical to GitHub's actual output)
@@ -21,6 +24,7 @@ const ICON_PATHS = {
   important: 'M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z',
   warning: 'M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575Zm1.763.707a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368Zm.53 3.996v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z',
   caution: 'M4.47.22A.749.749 0 0 1 5 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.33.22.53v6a.749.749 0 0 1-.22.53l-4.25 4.25A.749.749 0 0 1 11 16H5a.749.749 0 0 1-.53-.22L.22 11.53A.749.749 0 0 1 0 11V5c0-.199.079-.389.22-.53Zm.84 1.28L1.5 5.31v5.38l3.81 3.81h5.38l3.81-3.81V5.31L10.69 1.5ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z',
+  date: 'M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Zm7-3.25v2.992l2.028.812a.75.75 0 0 1-.557 1.392l-2.5-1A.751.751 0 0 1 7 8.25v-3.5a.75.75 0 0 1 1.5 0Z',
 };
 
 function titleHtml(type) {

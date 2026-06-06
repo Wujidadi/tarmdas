@@ -13,8 +13,8 @@ test('GitHub Alerts: [!NOTE] becomes an alert block and the marker is removed', 
   assert.ok(!html.includes('<blockquote>'), 'should no longer render as a blockquote');
 });
 
-test('GitHub Alerts: all five types are supported, case-insensitively', () => {
-  for (const type of ['NOTE', 'TIP', 'IMPORTANT', 'WARNING', 'CAUTION']) {
+test('GitHub Alerts: all six types are supported, case-insensitively', () => {
+  for (const type of ['NOTE', 'TIP', 'IMPORTANT', 'WARNING', 'CAUTION', 'DATE']) {
     const { html } = renderMarkdown(`> [!${type}]\n> body\n`);
     assert.ok(
       html.includes(`markdown-alert-${type.toLowerCase()}`),

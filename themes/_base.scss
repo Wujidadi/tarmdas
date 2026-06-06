@@ -96,8 +96,9 @@ blockquote {
   border-left: 0.25em solid var(--quote-border);
 }
 
-// GitHub Alerts (the five > [!NOTE]-style blocks). Per-type colors come from GitHub,
+// GitHub Alerts (the > [!NOTE]-style blocks). Per-type colors come from GitHub,
 // switching light/dark automatically via light-dark() based on the theme's color-scheme
+// The extra non-standard date type uses a neutral gray (a translucent white in dark mode)
 .markdown-alert {
   margin: 1em 0;
   padding: 0.5em 1em;
@@ -129,6 +130,7 @@ blockquote {
   &.markdown-alert-important { --alert-accent: light-dark(#8250df, #ab7df8); }
   &.markdown-alert-warning   { --alert-accent: light-dark(#9a6700, #d29922); }
   &.markdown-alert-caution   { --alert-accent: light-dark(#cf222e, #f85149); }
+  &.markdown-alert-date      { --alert-accent: light-dark(#6e7781, rgba(255, 255, 255, 0.6)); }
 }
 
 // GFM task lists: only task items drop their bullet; the checkbox sits at the list
