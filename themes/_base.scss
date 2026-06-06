@@ -103,6 +103,9 @@ blockquote {
   margin: 1em 0;
   padding: 0.5em 1em;
   border-left: 0.25em solid var(--alert-accent);
+  // A faint wash of the accent so the block reads as a tinted panel; derived from
+  // --alert-accent so every type and theme gets a matching tint with no per-type rule
+  background: color-mix(in srgb, var(--alert-accent) 8%, transparent);
 
   > :first-child {
     margin-top: 0;
