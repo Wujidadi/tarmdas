@@ -95,6 +95,7 @@ npm test                                        # 單元測試
 ## Commit 規範
 
 1. 所有 commit message 一律使用英文。
-2. 使用 [Conventional Commits](https://www.conventionalcommits.org/) 標準格式，以提高 commit message 的可讀性與可維護性。
+2. 使用 [Conventional Commits](.claude/references/conventional-commits.md) 標準格式，以提高 commit message 的可讀性和可維護性。
 3. 若變動較多、較為複雜，應在 commit 標題之外，列出至少一項 bullet point，說明本次異動的摘要，以及各個檔案的異動原因。
-4. 本文依語義斷行（一句一行，於句意完足處換行），不依固定欄寬硬換行。
+4. Commit message 每個段落最後一句不要帶上句號，每個獨立行的最後面也不要帶句號。
+5. 內容不遵照 72 字元斷行規則，須以 [Prose Linewrap Rules](.claude/references/prose-linewrap.md) 為準。
