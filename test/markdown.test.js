@@ -38,6 +38,27 @@ test('GitHub Alerts: marker with other text on the same line stays a regular quo
   assert.ok(!html.includes('markdown-alert'), 'should not become an alert block');
 });
 
+test('GitHub Alerts: [!DATE] accepts a custom label that replaces the default title', () => {
+  const { html } = renderMarkdown('> [!DATE] Last updated: 2026-06-06\n> body text\n');
+  assert.ok(html.includes('markdown-alert-date'), 'should still be a date alert');
+  assert.ok(html.includes('Last updated: 2026-06-06'), 'custom label should appear');
+  assert.ok(!html.includes('>Date<'), 'default "Date" title should be replaced');
+  assert.ok(html.includes('body text'), 'body should be preserved');
+  assert.ok(!html.includes('[!DATE]'), 'marker should not remain');
+});
+
+test('GitHub Alerts: [!DATE] without a label keeps the default title', () => {
+  const { html } = renderMarkdown('> [!DATE]\n> body\n');
+  assert.ok(html.includes('markdown-alert-date'));
+  assert.ok(html.includes('>Date<'), 'default title should be present');
+});
+
+test('GitHub Alerts: a [!DATE] label is HTML-escaped', () => {
+  const { html } = renderMarkdown('> [!DATE] <script>alert(1)</script>\n');
+  assert.ok(!html.includes('<script>'), 'raw HTML in the label must be escaped');
+  assert.ok(html.includes('&lt;script&gt;'), 'label should be escaped');
+});
+
 test('breaks: by default single newlines inside paragraphs are spaces, per the spec', () => {
   const { html } = renderMarkdown('first line\nsecond line\n');
   assert.ok(!html.includes('<br'), 'no <br> expected by default');

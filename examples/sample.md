@@ -77,6 +77,9 @@ Body text can reference footnotes[^1], named footnotes work too[^offline]; their
 > [!DATE]
 > 2026-06-06 — a non-standard type for highlighting a date or timestamp
 
+> [!DATE] Last updated: 2026-06-06
+> A label on the marker line replaces the default "Date" title
+
 ## Custom Containers
 
 Custom containers emit a block with a `custom-block-<name>` class, which you can style via `--css`:

@@ -4,9 +4,14 @@
 // Besides GitHub's five standard markers, a non-standard [!DATE] type is supported for
 // highlighting a date or timestamp block, rendered in a neutral gray accent
 // When the marker does not own the first line (other text follows on the same line),
-// the blockquote is left as is, matching GitHub's behavior
+// the blockquote is left as is, matching GitHub's behavior; the sole exception is [!DATE],
+// which accepts an optional label on the marker line to replace its default "Date" title
 
 const MARKER_RE = /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION|DATE)\][ \t]*(?:\n|$)/i;
+
+// [!DATE] with a custom label on the same line, e.g. [!DATE] Last updated 2026-06-06;
+// the captured label replaces the default title (the standard types do not support this)
+const DATE_LABEL_RE = /^\[!DATE\][ \t]+([^\n]+?)[ \t]*(?:\n|$)/i;
 
 const TITLES = {
   note: 'Note',
@@ -27,12 +32,12 @@ const ICON_PATHS = {
   date: 'M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Zm7-3.25v2.992l2.028.812a.75.75 0 0 1-.557 1.392l-2.5-1A.751.751 0 0 1 7 8.25v-3.5a.75.75 0 0 1 1.5 0Z',
 };
 
-function titleHtml(type) {
+function titleHtml(type, label) {
   return (
     `<p class="markdown-alert-title">` +
     `<svg class="octicon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">` +
     `<path d="${ICON_PATHS[type]}"></path></svg>` +
-    `${TITLES[type]}</p>\n`
+    `${label}</p>\n`
   );
 }
 
@@ -50,8 +55,11 @@ export function githubAlerts(md) {
       if (tokens[i + 1]?.type !== 'paragraph_open') continue;
       const inline = tokens[i + 2];
       if (inline?.type !== 'inline') continue;
+      // Standard marker owning the line, or [!DATE] followed by a custom label
       const m = inline.content.match(MARKER_RE);
-      if (!m) continue;
+      const labelMatch = m ? null : inline.content.match(DATE_LABEL_RE);
+      if (!m && !labelMatch) continue;
+      const match = m ?? labelMatch;
 
       // Find the blockquote_close at the same nesting level
       let close = -1;
@@ -64,22 +72,24 @@ export function githubAlerts(md) {
       }
       if (close === -1) continue;
 
-      const type = m[1].toLowerCase();
+      const type = m ? m[1].toLowerCase() : 'date';
       tokens[i].tag = 'div';
       tokens[i].attrJoin('class', `markdown-alert markdown-alert-${type}`);
       tokens[close].tag = 'div';
 
       // Remove the marker line from the first paragraph; drop the whole paragraph
       // if it contained only the marker
-      inline.content = inline.content.slice(m[0].length);
+      inline.content = inline.content.slice(match[0].length);
       if (inline.content === '') {
         tokens.splice(i + 1, 3);
       }
 
-      // Insert the title row at the start of the block
+      // Insert the title row at the start of the block; a [!DATE] label replaces the
+      // default title and is HTML-escaped since it goes straight into an html_block
+      const label = labelMatch ? md.utils.escapeHtml(labelMatch[1]) : TITLES[type];
       const title = new state.Token('html_block', '', 0);
       title.block = true;
-      title.content = titleHtml(type);
+      title.content = titleHtml(type, label);
       tokens.splice(i + 1, 0, title);
     }
   });
