@@ -3,7 +3,7 @@ import { parseArgs } from 'node:util';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 
-import { convertFile, DEFAULT_MAX_INLINE_SIZE } from './convert.js';
+import { convertFile, parseSize } from './convert.js';
 import { loadConfig, CONFIG_FILENAME, ALLOWED_KEYS } from './config.js';
 
 const require = createRequire(import.meta.url);
@@ -50,23 +50,19 @@ Config file:
   ${ALLOWED_KEYS.slice(0, 6).join(', ')},
   ${ALLOWED_KEYS.slice(6).join(', ')}
 
+Front matter:
+  A document's own YAML front matter (the leading --- block) may set the same
+  options, taking precedence over everything above (defaults < config < flags <
+  front matter), e.g. a line "max-width: 1670px". Keys accept either the camelCase
+  config names or the kebab-case flag names; booleans take true/false; unrelated
+  metadata (title, author, date...) is ignored. port and output are not accepted.
+
 Local file links:
   In links and images, a leading ~ expands to your home directory and a leading
   @/ expands to the config file's "basedir", both becoming absolute file:// URLs
   (e.g. [draft](~/notes/draft.md) or [draft](@/notes/draft.md)). The @/ prefix
   only works when basedir is set in ${CONFIG_FILENAME}.
 `.trim();
-
-// Parse size strings like 5m / 512k / 1g / 1048576 into a byte count
-function parseSize(value) {
-  if (value == null) return DEFAULT_MAX_INLINE_SIZE;
-  const m = String(value).trim().match(/^(\d+(?:\.\d+)?)\s*([kmg])?b?$/i);
-  if (!m) throw new Error(`Cannot parse --max-inline-size value: ${value}`);
-  const n = parseFloat(m[1]);
-  const unit = (m[2] || '').toLowerCase();
-  const mult = unit === 'g' ? 1024 ** 3 : unit === 'm' ? 1024 ** 2 : unit === 'k' ? 1024 : 1;
-  return Math.round(n * mult);
-}
 
 function formatBytes(n) {
   if (n < 1024) return `${n} B`;

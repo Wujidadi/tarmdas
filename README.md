@@ -137,6 +137,25 @@ On conversion, Tarmdas searches upward from the input file's directory and uses 
 - Per-conversion options such as `title` and `output` are not configurable here
 - The config file is a personal preference; consider adding it to your documents project's `.gitignore` and keeping it out of version control
 
+### Per-document front matter
+
+A single document can override these same options from its own YAML front matter (the leading `---` block), which is the highest-precedence layer: "built-in defaults < config file < CLI flags < front matter".
+
+```markdown
+---
+max-width: 1670px
+theme: github-dark
+mermaid: false
+---
+
+# My wide document
+```
+
+- Keys accept either the kebab-case flag name (`max-width`, `font-size`, `highlight-theme`) or the camelCase config name (`maxWidth`, `fontSize`, `highlightTheme`)
+- Booleans take `true`/`false` (also `yes`/`no`, `on`/`off`, `1`/`0`); bare numbers in `maxWidth`/`fontSize` mean px, exactly as in the config file
+- Relative `css`/`basedir` paths resolve against the document's own directory; `css` may be a single path or a comma-separated list
+- Unrelated metadata (`title`, `author`, `date`, ...) is left untouched, so front matter you already use keeps working; `port` and `output` are not accepted (they are not properties of a document)
+
 ## Built-in themes
 
 17 in total:

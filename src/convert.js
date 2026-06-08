@@ -1,5 +1,6 @@
 // Core conversion pipeline: Markdown → complete HTML document (with KaTeX, Mermaid, styles, inlined assets)
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
 
 import { renderMarkdown } from './markdown.js';
@@ -28,6 +29,86 @@ function parseFrontMatter(source) {
   return { data, content: source.slice(m[0].length) };
 }
 
+/**
+ * Parse a size string like 5m / 512k / 1g / 1048576 into a byte count
+ * @param {string|number} [value] Size string (k/m/g suffix, optional trailing b); null/undefined yields the default
+ * @returns {number}
+ */
+export function parseSize(value) {
+  if (value == null) return DEFAULT_MAX_INLINE_SIZE;
+  const m = String(value).trim().match(/^(\d+(?:\.\d+)?)\s*([kmg])?b?$/i);
+  if (!m) throw new Error(`Cannot parse max-inline-size value: ${value}`);
+  const n = parseFloat(m[1]);
+  const unit = (m[2] || '').toLowerCase();
+  const mult = unit === 'g' ? 1024 ** 3 : unit === 'm' ? 1024 ** 2 : unit === 'k' ? 1024 : 1;
+  return Math.round(n * mult);
+}
+
+// Options a document's own YAML front matter may set, overriding every other layer (built-in defaults < config file < CLI flags < front matter).
+// Keys are the camelCase config names; kebab-case flag forms (e.g. `max-width`) are accepted and normalized to them.
+// This mirrors config.js ALLOWED_KEYS minus the server/per-run-only port and output
+const FRONT_MATTER_OPTIONS = {
+  theme: 'string',
+  highlightTheme: 'string',
+  maxWidth: 'string',
+  fontSize: 'string',
+  externalAssets: 'boolean',
+  maxInlineSize: 'size',
+  breaks: 'boolean',
+  math: 'boolean',
+  mermaid: 'boolean',
+  highlight: 'boolean',
+  newTab: 'boolean',
+  css: 'paths',
+  basedir: 'dir',
+};
+
+// Coerce a front-matter boolean (values arrive as strings); return undefined when
+// unrecognized, so the key is left untouched rather than forced to false
+function frontMatterBool(value) {
+  const s = String(value).trim().toLowerCase();
+  if (s === 'true' || s === 'yes' || s === 'on' || s === '1') return true;
+  if (s === 'false' || s === 'no' || s === 'off' || s === '0') return false;
+  return undefined;
+}
+
+/**
+ * Build the front-matter option-override layer: recognize tarmdas option keys (camelCase
+ * or kebab-case), coerce their string values to the right types, and ignore everything
+ * else so unrelated metadata (author, date, tags...) is left alone
+ * @param {object} frontMatter Raw key/value pairs parsed from the leading --- block
+ * @param {string} baseDir     Directory of the Markdown file (for resolving css/basedir paths)
+ * @returns {object} Options to layer on top of the already-resolved opts
+ */
+function frontMatterOptions(frontMatter, baseDir) {
+  const out = {};
+  for (const [rawKey, rawValue] of Object.entries(frontMatter)) {
+    const key = rawKey.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+    const type = FRONT_MATTER_OPTIONS[key];
+    if (!type) continue;
+    if (type === 'boolean') {
+      const b = frontMatterBool(rawValue);
+      if (b !== undefined) out[key] = b;
+    } else if (type === 'size') {
+      out[key] = parseSize(rawValue);
+    } else if (type === 'paths') {
+      // A single path or a comma-separated list, each resolved against the Markdown file's directory
+      out[key] = String(rawValue)
+        .split(',')
+        .map((p) => p.trim())
+        .filter(Boolean)
+        .map((p) => path.resolve(baseDir, p));
+    } else if (type === 'dir') {
+      let b = String(rawValue).trim();
+      if (b === '~' || b.startsWith('~/')) b = path.join(os.homedir(), b.slice(1));
+      out[key] = path.resolve(baseDir, b);
+    } else {
+      out[key] = String(rawValue);
+    }
+  }
+  return out;
+}
+
 function stripTags(html) {
   return html.replace(/<[^>]+>/g, '').trim();
 }
@@ -48,8 +129,8 @@ function resolveTitle({ explicit, frontMatter, bodyHtml, fallback }) {
 }
 
 /**
- * Convert Markdown source into a complete HTML document string (copying oversized media
- * to the sidecar asset folder when needed)
+ * Convert Markdown source into a complete HTML document string (copying oversized media to the sidecar asset folder when needed).
+ * The document's own front matter is the highest-precedence layer: its recognized option keys override the matching opts below
  * @param {string} source Markdown source
  * @param {object} opts
  * @param {string} opts.baseDir                 Base directory for resolving relative resources
@@ -73,6 +154,12 @@ function resolveTitle({ explicit, frontMatter, bodyHtml, fallback }) {
  * @returns {Promise<{ html: string, title: string, features: object, media: { inlined: number, copied: string[] } }>}
  */
 export async function renderDocument(source, opts) {
+  const { data: frontMatter, content } = parseFrontMatter(source);
+
+  // The document's own front matter is the highest-precedence layer:
+  // its recognized option keys override the built-in defaults, the config file and the CLI flags carried in opts
+  const merged = { ...opts, ...frontMatterOptions(frontMatter, opts.baseDir) };
+
   const {
     baseDir,
     outputPath,
@@ -92,9 +179,7 @@ export async function renderDocument(source, opts) {
     homedir,
     basedir,
     newTab = true,
-  } = opts;
-
-  const { data: frontMatter, content } = parseFrontMatter(source);
+  } = merged;
 
   // 1) Markdown → HTML fragment, reporting which features were actually used
   const { html: rendered, features } = renderMarkdown(content, { math, highlight, breaks, homedir, basedir, newTab });

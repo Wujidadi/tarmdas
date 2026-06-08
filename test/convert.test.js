@@ -82,6 +82,50 @@ test('without front matter, the first H1 becomes the title', async () => {
   assert.equal(title, 'My Title');
 });
 
+test('front matter options take precedence over the resolved opts (kebab-case key)', async () => {
+  const dir = await tmpDir();
+  const src = '---\nmax-width: 1670px\n---\n# Hi\n';
+  const { html } = await renderDocument(src, {
+    baseDir: dir,
+    outputPath: path.join(dir, 'out.html'),
+    maxWidth: '1600px', // the config/CLI layer, which front matter must override
+  });
+  // The override is emitted after the base default, so it wins the cascade
+  assert.match(html, /--page-max-width:\s*1670px;/);
+});
+
+test('front matter accepts the camelCase config key too, and bare numbers become px', async () => {
+  const dir = await tmpDir();
+  const src = '---\nfontSize: 18\n---\n# Hi\n';
+  const { html } = await renderDocument(src, {
+    baseDir: dir,
+    outputPath: path.join(dir, 'out.html'),
+  });
+  assert.match(html, /--base-font-size:\s*18px;/);
+});
+
+test('front matter booleans are coerced: mermaid: false disables Mermaid', async () => {
+  const dir = await tmpDir();
+  const src = '---\nmermaid: false\n---\n```mermaid\ngraph TD\nA-->B\n```\n';
+  const { html, features } = await renderDocument(src, {
+    baseDir: dir,
+    outputPath: path.join(dir, 'out.html'),
+  });
+  assert.equal(features.mermaid, false);
+  assert.ok(!html.includes('mermaid.initialize'), 'the Mermaid script should not be inlined');
+});
+
+test('front matter ignores keys that are not tarmdas options (no error, no effect)', async () => {
+  const dir = await tmpDir();
+  const src = '---\nauthor: Jane\ndate: 2026-06-08\nmax-width: 900px\n---\n# Hi\n';
+  const { html, title } = await renderDocument(src, {
+    baseDir: dir,
+    outputPath: path.join(dir, 'out.html'),
+  });
+  assert.match(html, /--page-max-width:\s*900px;/);
+  assert.equal(title, 'Hi', 'unrelated metadata should not interfere with the title');
+});
+
 test('media inlining: PNG becomes Base64, SVG is inlined', async () => {
   const dir = await tmpDir();
   const png = Buffer.from(
