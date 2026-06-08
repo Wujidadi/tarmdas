@@ -32,6 +32,7 @@ import { githubAlerts } from './alerts.js';
 import { taskLists } from './tasklists.js';
 import { headingAnchors } from './anchors.js';
 import { tableOfContents } from './toc.js';
+import { homePaths } from './homepaths.js';
 
 // Custom container :::name — accepts any name and emits
 // <div class="custom-block custom-block-<name>"> so users can target it with custom CSS
@@ -74,10 +75,11 @@ function highlight(md, str, lang) {
  * @param {boolean} [opts.math=true]      Enable KaTeX
  * @param {boolean} [opts.highlight=true] Enable code highlighting
  * @param {boolean} [opts.breaks=false]   Render single newlines inside paragraphs as <br>
+ * @param {string}  [opts.homedir]        Home directory for expanding `~` link/image targets (default os.homedir())
  * @returns {MarkdownIt}
  */
 export function createMarkdownIt(opts = {}) {
-  const { math = true, highlight: useHighlight = true, breaks = false } = opts;
+  const { math = true, highlight: useHighlight = true, breaks = false, homedir } = opts;
 
   const md = new MarkdownIt({
     html: true,
@@ -119,6 +121,7 @@ export function createMarkdownIt(opts = {}) {
   md.use(abbr);
   md.use(ins);
   md.use(customContainer);
+  md.use(homePaths, { homedir });
   md.use(headingAnchors);
   md.use(tableOfContents); // must come after headingAnchors so TOC links match heading ids
 

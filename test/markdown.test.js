@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { pathToFileURL } from 'node:url';
 
 import { renderMarkdown } from '../src/markdown.js';
 
@@ -178,4 +179,37 @@ test('TOC: [[toc]] is replaced by a nested TOC whose links match heading ids', (
 test('TOC: no TOC is generated without a [[toc]] marker', () => {
   const { html } = renderMarkdown('# Install\nBody text\n');
   assert.ok(!html.includes('table-of-contents'));
+});
+
+test('Home paths: a leading ~ in a link expands to a file:// URL', () => {
+  const { html } = renderMarkdown('[draft](~/Documents/draft.md)\n', { homedir: '/home/tester' });
+  assert.ok(html.includes('href="file:///home/tester/Documents/draft.md"'), 'link should expand to file://');
+  assert.ok(!html.includes('~/Documents'), 'the literal ~ should not remain');
+});
+
+test('Home paths: a bare ~ link expands to the home directory itself', () => {
+  const { html } = renderMarkdown('[home](~)\n', { homedir: '/home/tester' });
+  assert.ok(html.includes('href="file:///home/tester"'), 'bare ~ should expand to the home directory');
+});
+
+test('Home paths: ~ in an image src is also expanded', () => {
+  const { html } = renderMarkdown('![pic](~/img/photo.png)\n', { homedir: '/home/tester' });
+  assert.ok(html.includes('src="file:///home/tester/img/photo.png"'), 'image src should expand to file://');
+});
+
+test('Home paths: CJK characters round-trip into a valid percent-encoded file:// URL', () => {
+  const { html } = renderMarkdown('[草案](~/文件/草案.md)\n', { homedir: '/home/tester' });
+  const expected = pathToFileURL('/home/tester/文件/草案.md').href;
+  assert.ok(html.includes(`href="${expected}"`), `should expand to ${expected}`);
+});
+
+test('Home paths: relative, absolute, remote and ~user targets are left untouched', () => {
+  const { html } = renderMarkdown(
+    '[rel](./a.md) [abs](/etc/x) [web](https://e.com/p) [user](~bob/x)\n',
+    { homedir: '/home/tester' },
+  );
+  assert.ok(html.includes('href="./a.md"'), 'relative link unchanged');
+  assert.ok(html.includes('href="/etc/x"'), 'absolute link unchanged');
+  assert.ok(html.includes('href="https://e.com/p"'), 'remote link unchanged');
+  assert.ok(html.includes('~bob/x'), 'the ambiguous ~user form is left untouched');
 });

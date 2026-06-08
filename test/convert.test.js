@@ -101,6 +101,23 @@ test('media inlining: PNG becomes Base64, SVG is inlined', async () => {
   assert.equal(media.inlined, 1, 'only the PNG counts toward the base64 inline count');
 });
 
+test('home paths: a ~-rooted image is resolved against homedir and inlined', async () => {
+  const dir = await tmpDir();
+  const png = Buffer.from(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+    'base64',
+  );
+  await writeFile(path.join(dir, 'dot.png'), png);
+  const { html, media } = await renderDocument('![p](~/dot.png)\n', {
+    baseDir: dir,
+    outputPath: path.join(dir, 'out.html'),
+    homedir: dir,
+  });
+  assert.ok(html.includes('data:image/png;base64'), 'the ~-rooted PNG should be Base64-inlined');
+  assert.ok(!html.includes('~/dot.png'), 'the literal ~ path should not remain');
+  assert.equal(media.inlined, 1);
+});
+
 test('threshold downgrade: media above max-inline-size goes to sidecar assets', async () => {
   const dir = await tmpDir();
   const png = Buffer.from(

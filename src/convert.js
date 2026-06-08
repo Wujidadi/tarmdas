@@ -67,6 +67,7 @@ function resolveTitle({ explicit, frontMatter, bodyHtml, fallback }) {
  * @param {boolean} [opts.highlight=true]       Enable code highlighting
  * @param {boolean} [opts.breaks=false]         Render single newlines inside paragraphs as <br>
  * @param {boolean} [opts.liveReload=false]     Inject the Live Reload script
+ * @param {string}  [opts.homedir]              Home directory for expanding `~` link/image targets (default os.homedir())
  * @returns {Promise<{ html: string, title: string, features: object, media: { inlined: number, copied: string[] } }>}
  */
 export async function renderDocument(source, opts) {
@@ -86,12 +87,13 @@ export async function renderDocument(source, opts) {
     highlight = true,
     breaks = false,
     liveReload = false,
+    homedir,
   } = opts;
 
   const { data: frontMatter, content } = parseFrontMatter(source);
 
   // 1) Markdown → HTML fragment, reporting which features were actually used
-  const { html: rendered, features } = renderMarkdown(content, { math, highlight, breaks });
+  const { html: rendered, features } = renderMarkdown(content, { math, highlight, breaks, homedir });
   const useMath = math && features.math;
   const useMermaid = mermaid && features.mermaid;
   const useCode = highlight && features.code;

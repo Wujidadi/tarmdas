@@ -22,6 +22,7 @@ By default it produces a self-contained single file: CSS, fonts, the Mermaid scr
 - **Heading anchors**: every heading gets a GitHub-style slug id (CJK preserved) and a clickable anchor, for in-page jumps and shareable section links
 - **Extended syntax**: definition lists (`term\n: definition`), mark `==text==`, superscript `x^2^` / subscript `H~2~O`, emoji shortcodes `:rocket:` (converted to Unicode at build time), abbreviations `*[ABBR]:`, insert `++ins++`, custom containers `:::name`
 - **Table of contents**: drop `[[toc]]` (or `[toc]`) into the document to generate a TOC nested by heading level with links to the matching anchors
+- **Home-path links**: a leading `~` in a link or image target (e.g. `[draft](~/notes/draft.md)`) expands to an absolute `file://` URL, so it still resolves to the real local file when the HTML is opened offline
 - **Built-in themes**: GitHub, One, Gruvbox, Tokyo Night, Solarized, Monokai, Dracula, Nord, xAI — 17 in total (most with light/dark), with body, code and Mermaid colors kept consistent
 - **Custom styles**: CSS plus SASS / SCSS / LESS preprocessing
 - **Config file**: place a `tarmdas.config.json` in your documents project to set common options (theme, page width, font size, etc.) and skip the flags

@@ -2,6 +2,7 @@
 // Mermaid JS, and local image/media handling
 import { readFile, copyFile, mkdir, stat } from 'node:fs/promises';
 import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
 const require = createRequire(import.meta.url);
@@ -147,8 +148,19 @@ export async function processMedia(html, opts) {
     // Skip URLs already rewritten to point into the sidecar asset folder, to avoid
     // double processing (e.g. an SVG copied twice in external mode)
     if (rawUrl.startsWith(`${assetHref}/`)) return null;
-    const clean = decodeURI(rawUrl.split(/[?#]/)[0]);
-    const abs = path.resolve(baseDir, clean);
+    // `~`-rooted targets have already been expanded to absolute file:// URLs upstream
+    // (see homepaths.js); decode those back to a real path so they can be inlined/copied
+    let abs;
+    if (/^file:\/\//i.test(rawUrl)) {
+      try {
+        abs = fileURLToPath(rawUrl.split('#')[0]);
+      } catch {
+        return null;
+      }
+    } else {
+      const clean = decodeURI(rawUrl.split(/[?#]/)[0]);
+      abs = path.resolve(baseDir, clean);
+    }
     try {
       const s = await stat(abs);
       if (!s.isFile()) return null;
