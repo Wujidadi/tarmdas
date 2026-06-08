@@ -91,6 +91,10 @@ export function createMarkdownIt(opts = {}) {
     highlight: useHighlight ? (str, lang) => highlight(md, str, lang) : undefined,
   });
 
+  // Linkify only explicit-scheme URLs (http://, https://, etc.);
+  // disable fuzzy detection so that bare domain-like strings such as filenames (`CLAUDE.md`) are not turned into links
+  md.linkify.set({ fuzzyLink: false, fuzzyEmail: false, fuzzyIP: false });
+
   // Allow file: links: as a local, offline tool we want `[doc](file:///...)` to resolve (the same file:// URLs that homePaths already emits);
   // javascript:/vbscript: stay blocked as XSS vectors and data: keeps its image-only exception
   md.validateLink = (url) => {
