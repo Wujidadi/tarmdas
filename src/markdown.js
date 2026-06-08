@@ -76,10 +76,11 @@ function highlight(md, str, lang) {
  * @param {boolean} [opts.highlight=true] Enable code highlighting
  * @param {boolean} [opts.breaks=false]   Render single newlines inside paragraphs as <br>
  * @param {string}  [opts.homedir]        Home directory for expanding `~` link/image targets (default os.homedir())
+ * @param {string}  [opts.basedir]        Absolute base directory for expanding `@/` link/image targets (no expansion when unset)
  * @returns {MarkdownIt}
  */
 export function createMarkdownIt(opts = {}) {
-  const { math = true, highlight: useHighlight = true, breaks = false, homedir } = opts;
+  const { math = true, highlight: useHighlight = true, breaks = false, homedir, basedir } = opts;
 
   const md = new MarkdownIt({
     html: true,
@@ -121,7 +122,7 @@ export function createMarkdownIt(opts = {}) {
   md.use(abbr);
   md.use(ins);
   md.use(customContainer);
-  md.use(homePaths, { homedir });
+  md.use(homePaths, { homedir, basedir });
   md.use(headingAnchors);
   md.use(tableOfContents); // must come after headingAnchors so TOC links match heading ids
 

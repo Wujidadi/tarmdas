@@ -46,6 +46,12 @@ Config file:
   CLI flags). Available fields (camelCase forms of the flags):
   ${ALLOWED_KEYS.slice(0, 6).join(', ')},
   ${ALLOWED_KEYS.slice(6).join(', ')}
+
+Local file links:
+  In links and images, a leading ~ expands to your home directory and a leading
+  @/ expands to the config file's "basedir", both becoming absolute file:// URLs
+  (e.g. [draft](~/notes/draft.md) or [draft](@/notes/draft.md)). The @/ prefix
+  only works when basedir is set in ${CONFIG_FILENAME}.
 `.trim();
 
 // Parse size strings like 5m / 512k / 1g / 1048576 into a byte count
@@ -142,6 +148,7 @@ export async function run(argv = process.argv.slice(2)) {
     math: values['no-math'] ? false : (cfg.math ?? true),
     mermaid: values['no-mermaid'] ? false : (cfg.mermaid ?? true),
     highlight: values['no-highlight'] ? false : (cfg.highlight ?? true),
+    basedir: cfg.basedir, // backs the `@/` link/image prefix (config-only)
   };
 
   if (values.watch) {

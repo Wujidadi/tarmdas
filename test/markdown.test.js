@@ -203,6 +203,22 @@ test('Home paths: CJK characters round-trip into a valid percent-encoded file://
   assert.ok(html.includes(`href="${expected}"`), `should expand to ${expected}`);
 });
 
+test('Base dir: @/ expands against the configured basedir into a file:// URL', () => {
+  const { html } = renderMarkdown('[draft](@/plan/draft.md)\n', { basedir: '/home/tester/Work/HS' });
+  assert.ok(html.includes('href="file:///home/tester/Work/HS/plan/draft.md"'), '@/ should expand to basedir');
+  assert.ok(!html.includes('@/plan'), 'the literal @/ should not remain');
+});
+
+test('Base dir: @/ in an image src is also expanded', () => {
+  const { html } = renderMarkdown('![pic](@/img/photo.png)\n', { basedir: '/home/tester/Work/HS' });
+  assert.ok(html.includes('src="file:///home/tester/Work/HS/img/photo.png"'), 'image @/ should expand to basedir');
+});
+
+test('Base dir: @/ is left untouched when no basedir is configured', () => {
+  const { html } = renderMarkdown('[x](@/plan/draft.md)\n');
+  assert.ok(html.includes('href="@/plan/draft.md"'), 'without basedir, @/ stays literal');
+});
+
 test('Home paths: relative, absolute, remote and ~user targets are left untouched', () => {
   const { html } = renderMarkdown(
     '[rel](./a.md) [abs](/etc/x) [web](https://e.com/p) [user](~bob/x)\n',

@@ -2,6 +2,7 @@
 // tarmdas.config.json and use it as the source of option defaults
 // (precedence: built-in defaults < config file < CLI flags)
 import { readFile, access } from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
 
 export const CONFIG_FILENAME = 'tarmdas.config.json';
@@ -21,6 +22,7 @@ export const ALLOWED_KEYS = [
   'mermaid',
   'highlight',
   'port',
+  'basedir',
 ];
 
 /**
@@ -72,11 +74,19 @@ export async function loadConfig(startDir) {
   }
 
   const config = { ...data };
+  const configDir = path.dirname(configPath);
   // css may be a single string or an array; relative paths resolve against the config
   // file's directory, independent of the runtime cwd
   if (config.css != null) {
     const list = Array.isArray(config.css) ? config.css : [config.css];
-    config.css = list.map((f) => path.resolve(path.dirname(configPath), f));
+    config.css = list.map((f) => path.resolve(configDir, f));
+  }
+  // basedir backs the `@/` link/image prefix; expand a leading `~` and resolve relative
+  // values against the config file's directory, so it ends up as an absolute path
+  if (config.basedir != null) {
+    let b = String(config.basedir);
+    if (b === '~' || b.startsWith('~/')) b = path.join(os.homedir(), b.slice(1));
+    config.basedir = path.resolve(configDir, b);
   }
   return { config, configPath };
 }

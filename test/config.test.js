@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtemp, mkdir, writeFile } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
+import { tmpdir, homedir } from 'node:os';
 import path from 'node:path';
 
 import { findConfig, loadConfig, CONFIG_FILENAME } from '../src/config.js';
@@ -53,6 +53,18 @@ test('loadConfig normalizes a css string into an array, resolving relative paths
   const { root, dir } = await tmpProject({ css: './style/extra.scss' }, 'docs');
   const { config } = await loadConfig(dir);
   assert.deepEqual(config.css, [path.join(root, 'style', 'extra.scss')]);
+});
+
+test('loadConfig resolves a relative basedir against the config dir', async () => {
+  const { root, dir } = await tmpProject({ basedir: './plan' }, 'docs');
+  const { config } = await loadConfig(dir);
+  assert.equal(config.basedir, path.join(root, 'plan'));
+});
+
+test('loadConfig expands a leading ~ in basedir to the home directory', async () => {
+  const { dir } = await tmpProject({ basedir: '~/Documents/Work' });
+  const { config } = await loadConfig(dir);
+  assert.equal(config.basedir, path.join(homedir(), 'Documents', 'Work'));
 });
 
 test('loadConfig throws on unknown fields', async () => {

@@ -22,7 +22,7 @@ By default it produces a self-contained single file: CSS, fonts, the Mermaid scr
 - **Heading anchors**: every heading gets a GitHub-style slug id (CJK preserved) and a clickable anchor, for in-page jumps and shareable section links
 - **Extended syntax**: definition lists (`term\n: definition`), mark `==text==`, superscript `x^2^` / subscript `H~2~O`, emoji shortcodes `:rocket:` (converted to Unicode at build time), abbreviations `*[ABBR]:`, insert `++ins++`, custom containers `:::name`
 - **Table of contents**: drop `[[toc]]` (or `[toc]`) into the document to generate a TOC nested by heading level with links to the matching anchors
-- **Home-path links**: a leading `~` in a link or image target (e.g. `[draft](~/notes/draft.md)`) expands to an absolute `file://` URL, so it still resolves to the real local file when the HTML is opened offline
+- **Home-path links**: a leading `~` in a link or image target (e.g. `[draft](~/notes/draft.md)`) expands to an absolute `file://` URL, so it still resolves to the real local file when the HTML is opened offline; set `basedir` in the config file and a leading `@/` expands the same way against that base directory, to keep deep repeated path prefixes short
 - **Built-in themes**: GitHub, One, Gruvbox, Tokyo Night, Solarized, Monokai, Dracula, Nord, xAI — 17 in total (most with light/dark), with body, code and Mermaid colors kept consistent
 - **Custom styles**: CSS plus SASS / SCSS / LESS preprocessing
 - **Config file**: place a `tarmdas.config.json` in your documents project to set common options (theme, page width, font size, etc.) and skip the flags
@@ -126,10 +126,11 @@ On conversion, Tarmdas searches upward from the input file's directory and uses 
 ```
 
 - Field names are the camelCase forms of the CLI long flags. Available fields:
-  `theme`, `highlightTheme`, `css`, `externalAssets`, `maxInlineSize`, `maxWidth`, `fontSize`, `breaks`, `math`, `mermaid`, `highlight`, `port`
+  `theme`, `highlightTheme`, `css`, `externalAssets`, `maxInlineSize`, `maxWidth`, `fontSize`, `breaks`, `math`, `mermaid`, `highlight`, `port`, `basedir`
 - `maxWidth` and `fontSize` accept any CSS length (e.g. `90ch`, `1.05rem`); bare numbers mean px, and the Mermaid diagram font size follows `fontSize`
 - `math`, `mermaid` and `highlight` are booleans; setting them to `false` is equivalent to the `--no-math` etc. flags
 - `css` may be a string or an array; relative paths resolve against the config file's directory
+- `basedir` sets the directory that the `@/` link/image prefix expands against (see "Home-path links" above); a leading `~` is expanded and relative values resolve against the config file's directory
 - Per-conversion options such as `title` and `output` are not configurable here
 - The config file is a personal preference; consider adding it to your documents project's `.gitignore` and keeping it out of version control
 
