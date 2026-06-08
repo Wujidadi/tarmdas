@@ -21,6 +21,7 @@ export const ALLOWED_KEYS = [
   'math',
   'mermaid',
   'highlight',
+  'newTab',
   'port',
   'basedir',
 ];

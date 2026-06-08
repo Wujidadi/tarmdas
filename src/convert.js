@@ -69,6 +69,7 @@ function resolveTitle({ explicit, frontMatter, bodyHtml, fallback }) {
  * @param {boolean} [opts.liveReload=false]     Inject the Live Reload script
  * @param {string}  [opts.homedir]              Home directory for expanding `~` link/image targets (default os.homedir())
  * @param {string}  [opts.basedir]              Absolute base directory for expanding `@/` link/image targets (no expansion when unset)
+ * @param {boolean} [opts.newTab=true]          Open links to other documents in a new tab (target="_blank")
  * @returns {Promise<{ html: string, title: string, features: object, media: { inlined: number, copied: string[] } }>}
  */
 export async function renderDocument(source, opts) {
@@ -90,12 +91,13 @@ export async function renderDocument(source, opts) {
     liveReload = false,
     homedir,
     basedir,
+    newTab = true,
   } = opts;
 
   const { data: frontMatter, content } = parseFrontMatter(source);
 
   // 1) Markdown → HTML fragment, reporting which features were actually used
-  const { html: rendered, features } = renderMarkdown(content, { math, highlight, breaks, homedir, basedir });
+  const { html: rendered, features } = renderMarkdown(content, { math, highlight, breaks, homedir, basedir, newTab });
   const useMath = math && features.math;
   const useMermaid = mermaid && features.mermaid;
   const useCode = highlight && features.code;

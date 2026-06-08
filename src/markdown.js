@@ -33,9 +33,10 @@ import { taskLists } from './tasklists.js';
 import { headingAnchors } from './anchors.js';
 import { tableOfContents } from './toc.js';
 import { homePaths } from './homepaths.js';
+import { newTabLinks } from './newtab.js';
 
-// Custom container :::name — accepts any name and emits
-// <div class="custom-block custom-block-<name>"> so users can target it with custom CSS
+// Custom container :::name — accepts any name and emits <div class="custom-block custom-block-<name>">
+// so users can target it with custom CSS
 function customContainer(md) {
   md.use(container, 'custom', {
     validate: () => true,
@@ -52,8 +53,7 @@ function renderMermaid(md, code) {
   return `<pre class="mermaid">${md.utils.escapeHtml(code)}</pre>`;
 }
 
-// Code highlighting: return a complete <pre>; markdown-it skips its own wrapper
-// when the output starts with <pre
+// Code highlighting: return a complete <pre>; markdown-it skips its own wrapper when the output starts with <pre
 function highlight(md, str, lang) {
   if (lang === 'mermaid') {
     return renderMermaid(md, str);
@@ -77,10 +77,11 @@ function highlight(md, str, lang) {
  * @param {boolean} [opts.breaks=false]   Render single newlines inside paragraphs as <br>
  * @param {string}  [opts.homedir]        Home directory for expanding `~` link/image targets (default os.homedir())
  * @param {string}  [opts.basedir]        Absolute base directory for expanding `@/` link/image targets (no expansion when unset)
+ * @param {boolean} [opts.newTab=true]    Open links to other documents in a new tab (target="_blank")
  * @returns {MarkdownIt}
  */
 export function createMarkdownIt(opts = {}) {
-  const { math = true, highlight: useHighlight = true, breaks = false, homedir, basedir } = opts;
+  const { math = true, highlight: useHighlight = true, breaks = false, homedir, basedir, newTab = true } = opts;
 
   const md = new MarkdownIt({
     html: true,
@@ -89,6 +90,15 @@ export function createMarkdownIt(opts = {}) {
     breaks,
     highlight: useHighlight ? (str, lang) => highlight(md, str, lang) : undefined,
   });
+
+  // Allow file: links: as a local, offline tool we want `[doc](file:///...)` to resolve (the same file:// URLs that homePaths already emits);
+  // javascript:/vbscript: stay blocked as XSS vectors and data: keeps its image-only exception
+  md.validateLink = (url) => {
+    const str = url.trim().toLowerCase();
+    return /^(?:vbscript|javascript|data):/.test(str)
+      ? /^data:image\/(?:gif|png|jpeg|webp);/.test(str)
+      : true;
+  };
 
   // Even with highlighting disabled, mermaid fences still need to be intercepted
   if (!useHighlight) {
@@ -123,6 +133,7 @@ export function createMarkdownIt(opts = {}) {
   md.use(ins);
   md.use(customContainer);
   md.use(homePaths, { homedir, basedir });
+  if (newTab) md.use(newTabLinks); // after homePaths so rewritten file:// targets are covered
   md.use(headingAnchors);
   md.use(tableOfContents); // must come after headingAnchors so TOC links match heading ids
 
@@ -130,8 +141,7 @@ export function createMarkdownIt(opts = {}) {
 }
 
 /**
- * Render Markdown text into an HTML fragment, reporting which features were actually
- * used (for on-demand asset inlining)
+ * Render Markdown text into an HTML fragment, reporting which features were actually used (for on-demand asset inlining)
  * @param {string} source Markdown source
  * @param {object} [opts] Options forwarded to createMarkdownIt
  * @returns {{ html: string, features: { math: boolean, mermaid: boolean, code: boolean } }}

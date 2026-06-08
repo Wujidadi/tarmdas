@@ -32,6 +32,9 @@ Options:
       --title <text>         Document title (default: front matter or first H1)
       --breaks               Render single newlines inside paragraphs as <br>
                              (default: treated as spaces per the Markdown spec)
+      --no-new-tab           Keep links to other documents in the same tab
+                             (default: they open in a new tab with
+                             target="_blank" rel="noopener noreferrer")
       --no-math              Disable KaTeX
       --no-mermaid           Disable Mermaid
       --no-highlight         Disable code highlighting
@@ -71,9 +74,9 @@ function formatBytes(n) {
   return `${(n / 1024 ** 2).toFixed(2)} MB`;
 }
 
-// Note: options that can come from the config file get no parseArgs default, so that
-// "flag not given" is distinguishable from "explicitly given" and only falls back to
-// the config-file layer when unspecified
+// Note: options that can come from the config file get no parseArgs default,
+// so that "flag not given" is distinguishable from "explicitly given"
+// and only falls back to the config-file layer when unspecified
 const OPTIONS = {
   output: { type: 'string', short: 'o' },
   css: { type: 'string', multiple: true },
@@ -85,6 +88,7 @@ const OPTIONS = {
   'font-size': { type: 'string' },
   title: { type: 'string' },
   breaks: { type: 'boolean' },
+  'no-new-tab': { type: 'boolean', default: false },
   'no-math': { type: 'boolean', default: false },
   'no-mermaid': { type: 'boolean', default: false },
   'no-highlight': { type: 'boolean', default: false },
@@ -122,8 +126,7 @@ export async function run(argv = process.argv.slice(2)) {
     return;
   }
 
-  // Load the project config file (searching upward from the input file's directory)
-  // as the default-value layer for options
+  // Load the project config file (searching upward from the input file's directory) as the default-value layer for options
   let cfg = {};
   try {
     ({ config: cfg } = await loadConfig(path.dirname(path.resolve(input))));
@@ -145,6 +148,7 @@ export async function run(argv = process.argv.slice(2)) {
     fontSize: values['font-size'] ?? cfg.fontSize,
     title: values.title,
     breaks: values.breaks ?? cfg.breaks ?? false,
+    newTab: values['no-new-tab'] ? false : (cfg.newTab ?? true),
     math: values['no-math'] ? false : (cfg.math ?? true),
     mermaid: values['no-mermaid'] ? false : (cfg.mermaid ?? true),
     highlight: values['no-highlight'] ? false : (cfg.highlight ?? true),

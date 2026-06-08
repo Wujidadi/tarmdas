@@ -229,3 +229,55 @@ test('Home paths: relative, absolute, remote and ~user targets are left untouche
   assert.ok(html.includes('href="https://e.com/p"'), 'remote link unchanged');
   assert.ok(html.includes('~bob/x'), 'the ambiguous ~user form is left untouched');
 });
+
+test('New tab: external http(s) links get target=_blank and the rel guard by default', () => {
+  const { html } = renderMarkdown('[web](https://e.com/p)\n');
+  assert.ok(
+    html.includes('target="_blank"') && html.includes('rel="noopener noreferrer"'),
+    'external link should open in a new tab with the rel guard',
+  );
+});
+
+test('New tab: protocol-relative links also open in a new tab', () => {
+  const { html } = renderMarkdown('[web](//e.com/p)\n');
+  assert.ok(html.includes('target="_blank"'), 'protocol-relative link should open in a new tab');
+});
+
+test('New tab: relative and absolute path links also open in a new tab (other documents)', () => {
+  const { html } = renderMarkdown('[rel](./a.md) and [abs](/docs/x.html)\n');
+  assert.equal(
+    (html.match(/target="_blank"/g) || []).length,
+    2,
+    'both the relative and absolute path links should open in a new tab',
+  );
+});
+
+test('New tab: literal file:// links resolve (validateLink allows file:) and open in a new tab', () => {
+  const { html } = renderMarkdown('[doc](file:///tmp/a.html)\n');
+  assert.ok(html.includes('href="file:///tmp/a.html"'), 'a literal file:// href is no longer stripped');
+  assert.ok(html.includes('target="_blank"'), 'the file:// link should open in a new tab');
+});
+
+test('New tab: ~ home-path links expanded to file:// also open in a new tab', () => {
+  const { html } = renderMarkdown('[draft](~/notes/draft.md)\n', { homedir: '/home/tester' });
+  assert.ok(html.includes('href="file:///home/tester/notes/draft.md"'), 'home path expands to file://');
+  assert.ok(html.includes('target="_blank"'), 'the expanded file:// link should open in a new tab');
+});
+
+test('New tab: in-page # anchors and non-navigational schemes stay in the same tab', () => {
+  const { html } = renderMarkdown('[here](#section) and [mail](mailto:a@e.com) and [call](tel:123)\n');
+  assert.ok(!html.includes('target='), 'anchors, mailto: and tel: links get no target');
+});
+
+test('New tab: javascript: links stay blocked even though file: is allowed', () => {
+  // validateLink rejects javascript:, so markdown-it never builds an anchor (the marker is
+  // left as inert escaped text); assert no <a>/href is emitted rather than scanning raw text
+  const { html } = renderMarkdown('[x](javascript:alert(1))\n');
+  assert.ok(!/<a\b/.test(html), 'no anchor element is created for a javascript: link');
+  assert.ok(!html.includes('href='), 'no href is emitted for a javascript: link');
+});
+
+test('New tab: can be turned off, leaving all links in the same tab', () => {
+  const { html } = renderMarkdown('[web](https://e.com/p)\n', { newTab: false });
+  assert.ok(!html.includes('target='), 'no target attribute when newTab is disabled');
+});
