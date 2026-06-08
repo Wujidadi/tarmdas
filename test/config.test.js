@@ -55,16 +55,16 @@ test('loadConfig normalizes a css string into an array, resolving relative paths
   assert.deepEqual(config.css, [path.join(root, 'style', 'extra.scss')]);
 });
 
-test('loadConfig resolves a relative basedir against the config dir', async () => {
-  const { root, dir } = await tmpProject({ basedir: './plan' }, 'docs');
+test('loadConfig resolves a relative baseDir against the config dir', async () => {
+  const { root, dir } = await tmpProject({ baseDir: './plan' }, 'docs');
   const { config } = await loadConfig(dir);
-  assert.equal(config.basedir, path.join(root, 'plan'));
+  assert.equal(config.baseDir, path.join(root, 'plan'));
 });
 
-test('loadConfig expands a leading ~ in basedir to the home directory', async () => {
-  const { dir } = await tmpProject({ basedir: '~/Documents/Work' });
+test('loadConfig expands a leading ~ in baseDir to the home directory', async () => {
+  const { dir } = await tmpProject({ baseDir: '~/Documents/Work' });
   const { config } = await loadConfig(dir);
-  assert.equal(config.basedir, path.join(homedir(), 'Documents', 'Work'));
+  assert.equal(config.baseDir, path.join(homedir(), 'Documents', 'Work'));
 });
 
 test('loadConfig throws on unknown fields', async () => {

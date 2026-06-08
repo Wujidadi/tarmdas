@@ -59,9 +59,9 @@ Front matter:
 
 Local file links:
   In links and images, a leading ~ expands to your home directory and a leading
-  @/ expands to the config file's "basedir", both becoming absolute file:// URLs
+  @/ expands to the config file's "baseDir", both becoming absolute file:// URLs
   (e.g. [draft](~/notes/draft.md) or [draft](@/notes/draft.md)). The @/ prefix
-  only works when basedir is set in ${CONFIG_FILENAME}.
+  only works when baseDir is set in ${CONFIG_FILENAME}.
 `.trim();
 
 function formatBytes(n) {
@@ -148,7 +148,7 @@ export async function run(argv = process.argv.slice(2)) {
     math: values['no-math'] ? false : (cfg.math ?? true),
     mermaid: values['no-mermaid'] ? false : (cfg.mermaid ?? true),
     highlight: values['no-highlight'] ? false : (cfg.highlight ?? true),
-    basedir: cfg.basedir, // backs the `@/` link/image prefix (config-only)
+    baseDir: cfg.baseDir, // backs the `@/` link/image prefix
   };
 
   if (values.watch) {

@@ -130,7 +130,7 @@ function sanitizeSvg(svg) {
  * or copying them to the sidecar asset folder depending on the mode
  * @param {string} html Rendered HTML fragment
  * @param {object} opts
- * @param {string} opts.baseDir           Base for resolving relative paths (the Markdown file's directory)
+ * @param {string} opts.sourceDir         Base for resolving relative paths (the Markdown file's directory)
  * @param {'inline'|'external'} opts.mode Inline or external
  * @param {number} opts.maxInlineSize     In inline mode, files above this byte count go sidecar instead
  * @param {string} opts.assetDir          Absolute path of the sidecar asset folder
@@ -138,7 +138,7 @@ function sanitizeSvg(svg) {
  * @returns {Promise<{ html: string, inlined: number, copied: string[] }>}
  */
 export async function processMedia(html, opts) {
-  const { baseDir, mode, maxInlineSize, assetDir, assetHref } = opts;
+  const { sourceDir, mode, maxInlineSize, assetDir, assetHref } = opts;
   let inlined = 0;
   const copied = [];
   const usedNames = new Map(); // absolute path -> sidecar file name (deduplicated)
@@ -159,7 +159,7 @@ export async function processMedia(html, opts) {
       }
     } else {
       const clean = decodeURI(rawUrl.split(/[?#]/)[0]);
-      abs = path.resolve(baseDir, clean);
+      abs = path.resolve(sourceDir, clean);
     }
     try {
       const s = await stat(abs);

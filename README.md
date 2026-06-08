@@ -22,7 +22,7 @@ By default it produces a self-contained single file: CSS, fonts, the Mermaid scr
 - **Heading anchors**: every heading gets a GitHub-style slug id (CJK preserved) and a clickable anchor, for in-page jumps and shareable section links
 - **Extended syntax**: definition lists (`term\n: definition`), mark `==text==`, superscript `x^2^` / subscript `H~2~O`, emoji shortcodes `:rocket:` (converted to Unicode at build time), abbreviations `*[ABBR]:`, insert `++ins++`, custom containers `:::name`
 - **Table of contents**: drop `[[toc]]` (or `[toc]`) into the document to generate a TOC nested by heading level with links to the matching anchors
-- **Home-path links**: a leading `~` in a link or image target (e.g. `[draft](~/notes/draft.md)`) expands to an absolute `file://` URL, so it still resolves to the real local file when the HTML is opened offline; set `basedir` in the config file and a leading `@/` expands the same way against that base directory, to keep deep repeated path prefixes short
+- **Home-path links**: a leading `~` in a link or image target (e.g. `[draft](~/notes/draft.md)`) expands to an absolute `file://` URL, so it still resolves to the real local file when the HTML is opened offline; set `baseDir` in the config file and a leading `@/` expands the same way against that base directory, to keep deep repeated path prefixes short
 - **New-tab links**: links to another document — external (`http(s)`, protocol-relative), local `file://` and relative/absolute paths — open in a new tab with `target="_blank" rel="noopener noreferrer"`; only in-page `#` anchors and non-navigational schemes (`mailto:`, `tel:`) stay in the same tab. On by default (this is a single-document converter, not a site with navigation chrome); pass `--no-new-tab` or set `"newTab": false` to keep everything in the same tab. Literal `file://` links are allowed (`javascript:`/`vbscript:` stay blocked)
 - **Built-in themes**: GitHub, One, Gruvbox, Tokyo Night, Solarized, Monokai, Dracula, Nord, xAI — 17 in total (most with light/dark), with body, code and Mermaid colors kept consistent
 - **Custom styles**: CSS plus SASS / SCSS / LESS preprocessing
@@ -128,12 +128,12 @@ On conversion, Tarmdas searches upward from the input file's directory and uses 
 ```
 
 - Field names are the camelCase forms of the CLI long flags. Available fields:
-  `theme`, `highlightTheme`, `css`, `externalAssets`, `maxInlineSize`, `maxWidth`, `fontSize`, `breaks`, `newTab`, `math`, `mermaid`, `highlight`, `port`, `basedir`
+  `theme`, `highlightTheme`, `css`, `externalAssets`, `maxInlineSize`, `maxWidth`, `fontSize`, `breaks`, `newTab`, `math`, `mermaid`, `highlight`, `port`, `baseDir`
 - `maxWidth` and `fontSize` accept any CSS length (e.g. `90ch`, `1.05rem`); bare numbers mean px, and the Mermaid diagram font size follows `fontSize`
 - `math`, `mermaid` and `highlight` are booleans; setting them to `false` is equivalent to the `--no-math` etc. flags
 - `newTab` is a boolean defaulting to `true`; setting it to `false` is equivalent to the `--no-new-tab` flag
 - `css` may be a string or an array; relative paths resolve against the config file's directory
-- `basedir` sets the directory that the `@/` link/image prefix expands against (see "Home-path links" above); a leading `~` is expanded and relative values resolve against the config file's directory
+- `baseDir` sets the directory that the `@/` link/image prefix expands against (see "Home-path links" above); a leading `~` is expanded and relative values resolve against the config file's directory
 - Per-conversion options such as `title` and `output` are not configurable here
 - The config file is a personal preference; consider adding it to your documents project's `.gitignore` and keeping it out of version control
 
@@ -153,7 +153,7 @@ mermaid: false
 
 - Keys accept either the kebab-case flag name (`max-width`, `font-size`, `highlight-theme`) or the camelCase config name (`maxWidth`, `fontSize`, `highlightTheme`)
 - Booleans take `true`/`false` (also `yes`/`no`, `on`/`off`, `1`/`0`); bare numbers in `maxWidth`/`fontSize` mean px, exactly as in the config file
-- Relative `css`/`basedir` paths resolve against the document's own directory; `css` may be a single path or a comma-separated list
+- Relative `css`/`baseDir` paths resolve against the document's own directory; `css` may be a single path or a comma-separated list
 - Unrelated metadata (`title`, `author`, `date`, ...) is left untouched, so front matter you already use keeps working; `port` and `output` are not accepted (they are not properties of a document)
 
 ## Built-in themes

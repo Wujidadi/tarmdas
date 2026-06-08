@@ -23,7 +23,7 @@ export const ALLOWED_KEYS = [
   'highlight',
   'newTab',
   'port',
-  'basedir',
+  'baseDir',
 ];
 
 /**
@@ -82,12 +82,12 @@ export async function loadConfig(startDir) {
     const list = Array.isArray(config.css) ? config.css : [config.css];
     config.css = list.map((f) => path.resolve(configDir, f));
   }
-  // basedir backs the `@/` link/image prefix; expand a leading `~` and resolve relative
+  // baseDir backs the `@/` link/image prefix; expand a leading `~` and resolve relative
   // values against the config file's directory, so it ends up as an absolute path
-  if (config.basedir != null) {
-    let b = String(config.basedir);
+  if (config.baseDir != null) {
+    let b = String(config.baseDir);
     if (b === '~' || b.startsWith('~/')) b = path.join(os.homedir(), b.slice(1));
-    config.basedir = path.resolve(configDir, b);
+    config.baseDir = path.resolve(configDir, b);
   }
   return { config, configPath };
 }

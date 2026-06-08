@@ -77,7 +77,7 @@ test('renderDocument: github-dark links dark body, hljs and Mermaid together', a
   const dir = await tmpDir();
   const src = '# Title\n\n```js\nconst a=1;\n```\n\n```mermaid\ngraph TD\nA-->B\n```\n';
   const { html } = await renderDocument(src, {
-    baseDir: dir,
+    sourceDir: dir,
     outputPath: path.join(dir, 'out.html'),
     theme: 'github-dark',
   });
@@ -90,7 +90,7 @@ test('renderDocument: the default github theme auto-switches', async () => {
   const dir = await tmpDir();
   const src = '```mermaid\ngraph TD\nA-->B\n```\n';
   const { html } = await renderDocument(src, {
-    baseDir: dir,
+    sourceDir: dir,
     outputPath: path.join(dir, 'out.html'),
   });
   assert.ok(html.includes('prefers-color-scheme: dark'), 'auto theme contains the media query');
@@ -101,7 +101,7 @@ test('highlightTheme overrides the document theme code colors', async () => {
   const dir = await tmpDir();
   const src = '```js\nconst a=1;\n```\n';
   const { html } = await renderDocument(src, {
-    baseDir: dir,
+    sourceDir: dir,
     outputPath: path.join(dir, 'out.html'),
     theme: 'github-light',
     highlightTheme: 'github-dark',

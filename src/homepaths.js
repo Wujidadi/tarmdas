@@ -22,10 +22,10 @@ function joinDecoded(root, tail) {
 // Expand a `~`/`~/...` (home) or `@/...` (base directory) target into an absolute path;
 // return null for anything else (other-user forms like `~bob` are intentionally left
 // untouched as too ambiguous, and `@/` only expands when a base directory is configured)
-function expandTarget(target, homedir, basedir) {
+function expandTarget(target, homedir, baseDir) {
   if (target === '~') return homedir;
   if (target.startsWith('~/')) return joinDecoded(homedir, target.slice(2));
-  if (basedir && target.startsWith('@/')) return joinDecoded(basedir, target.slice(2));
+  if (baseDir && target.startsWith('@/')) return joinDecoded(baseDir, target.slice(2));
   return null;
 }
 
@@ -35,11 +35,11 @@ function expandTarget(target, homedir, basedir) {
  * @param {import('markdown-it')} md
  * @param {object} [opts]
  * @param {string} [opts.homedir] Home directory used for `~` expansion (default os.homedir())
- * @param {string} [opts.basedir] Absolute base directory used for `@/` expansion (no `@/` expansion when unset)
+ * @param {string} [opts.baseDir] Absolute base directory used for `@/` expansion (no `@/` expansion when unset)
  */
 export function homePaths(md, opts = {}) {
   const homedir = opts.homedir ?? os.homedir();
-  const { basedir } = opts;
+  const { baseDir } = opts;
 
   md.core.ruler.push('home_paths', (state) => {
     for (const token of state.tokens) {
@@ -50,7 +50,7 @@ export function homePaths(md, opts = {}) {
         if (!attr) continue;
         const value = child.attrGet(attr);
         if (!value) continue;
-        const abs = expandTarget(value, homedir, basedir);
+        const abs = expandTarget(value, homedir, baseDir);
         if (abs != null) child.attrSet(attr, pathToFileURL(abs).href);
       }
     }

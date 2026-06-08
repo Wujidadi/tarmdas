@@ -60,7 +60,7 @@ const FRONT_MATTER_OPTIONS = {
   highlight: 'boolean',
   newTab: 'boolean',
   css: 'paths',
-  basedir: 'dir',
+  baseDir: 'dir',
 };
 
 // Coerce a front-matter boolean (values arrive as strings); return undefined when
@@ -77,10 +77,10 @@ function frontMatterBool(value) {
  * or kebab-case), coerce their string values to the right types, and ignore everything
  * else so unrelated metadata (author, date, tags...) is left alone
  * @param {object} frontMatter Raw key/value pairs parsed from the leading --- block
- * @param {string} baseDir     Directory of the Markdown file (for resolving css/basedir paths)
+ * @param {string} sourceDir   Directory of the Markdown file (for resolving css/baseDir paths)
  * @returns {object} Options to layer on top of the already-resolved opts
  */
-function frontMatterOptions(frontMatter, baseDir) {
+function frontMatterOptions(frontMatter, sourceDir) {
   const out = {};
   for (const [rawKey, rawValue] of Object.entries(frontMatter)) {
     const key = rawKey.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
@@ -97,11 +97,11 @@ function frontMatterOptions(frontMatter, baseDir) {
         .split(',')
         .map((p) => p.trim())
         .filter(Boolean)
-        .map((p) => path.resolve(baseDir, p));
+        .map((p) => path.resolve(sourceDir, p));
     } else if (type === 'dir') {
       let b = String(rawValue).trim();
       if (b === '~' || b.startsWith('~/')) b = path.join(os.homedir(), b.slice(1));
-      out[key] = path.resolve(baseDir, b);
+      out[key] = path.resolve(sourceDir, b);
     } else {
       out[key] = String(rawValue);
     }
@@ -133,7 +133,7 @@ function resolveTitle({ explicit, frontMatter, bodyHtml, fallback }) {
  * The document's own front matter is the highest-precedence layer: its recognized option keys override the matching opts below
  * @param {string} source Markdown source
  * @param {object} opts
- * @param {string} opts.baseDir                 Base directory for resolving relative resources
+ * @param {string} opts.sourceDir               Directory of the Markdown source file, for resolving relative resources
  * @param {string} opts.outputPath              Target path of the output HTML (determines sidecar asset folder location/name)
  * @param {string[]} [opts.css=[]]              User-supplied stylesheets
  * @param {boolean} [opts.externalAssets=false] Use external-asset mode instead
@@ -149,7 +149,7 @@ function resolveTitle({ explicit, frontMatter, bodyHtml, fallback }) {
  * @param {boolean} [opts.breaks=false]         Render single newlines inside paragraphs as <br>
  * @param {boolean} [opts.liveReload=false]     Inject the Live Reload script
  * @param {string}  [opts.homedir]              Home directory for expanding `~` link/image targets (default os.homedir())
- * @param {string}  [opts.basedir]              Absolute base directory for expanding `@/` link/image targets (no expansion when unset)
+ * @param {string}  [opts.baseDir]              Absolute base directory for expanding `@/` link/image targets (no expansion when unset)
  * @param {boolean} [opts.newTab=true]          Open links to other documents in a new tab (target="_blank")
  * @returns {Promise<{ html: string, title: string, features: object, media: { inlined: number, copied: string[] } }>}
  */
@@ -158,10 +158,10 @@ export async function renderDocument(source, opts) {
 
   // The document's own front matter is the highest-precedence layer:
   // its recognized option keys override the built-in defaults, the config file and the CLI flags carried in opts
-  const merged = { ...opts, ...frontMatterOptions(frontMatter, opts.baseDir) };
+  const merged = { ...opts, ...frontMatterOptions(frontMatter, opts.sourceDir) };
 
   const {
-    baseDir,
+    sourceDir,
     outputPath,
     css = [],
     externalAssets = false,
@@ -177,12 +177,12 @@ export async function renderDocument(source, opts) {
     breaks = false,
     liveReload = false,
     homedir,
-    basedir,
+    baseDir,
     newTab = true,
   } = merged;
 
   // 1) Markdown → HTML fragment, reporting which features were actually used
-  const { html: rendered, features } = renderMarkdown(content, { math, highlight, breaks, homedir, basedir, newTab });
+  const { html: rendered, features } = renderMarkdown(content, { math, highlight, breaks, homedir, baseDir, newTab });
   const useMath = math && features.math;
   const useMermaid = mermaid && features.mermaid;
   const useCode = highlight && features.code;
@@ -191,7 +191,7 @@ export async function renderDocument(source, opts) {
   const outBase = path.basename(outputPath, path.extname(outputPath));
   const assetDirName = `${outBase}.assets`;
   const { html: body, inlined, copied } = await processMedia(rendered, {
-    baseDir,
+    sourceDir,
     mode: externalAssets ? 'external' : 'inline',
     maxInlineSize,
     assetDir: path.join(path.dirname(outputPath), assetDirName),
@@ -258,7 +258,7 @@ export async function convertFile(inputPath, opts = {}) {
 
   const result = await renderDocument(source, {
     ...opts,
-    baseDir: path.dirname(absInput),
+    sourceDir: path.dirname(absInput),
     outputPath,
   });
 

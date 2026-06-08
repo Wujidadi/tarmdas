@@ -13,7 +13,7 @@ async function tmpDir() {
 test('on-demand inlining: plain text carries no KaTeX/Mermaid assets', async () => {
   const dir = await tmpDir();
   const { html, features } = await renderDocument('# Hi\n\nplain', {
-    baseDir: dir,
+    sourceDir: dir,
     outputPath: path.join(dir, 'out.html'),
   });
   // Check directly that no on-demand asset was detected or inlined, rather than
@@ -32,7 +32,7 @@ test('on-demand inlining: plain text carries no KaTeX/Mermaid assets', async () 
 test('KaTeX: documents with math get inlined fonts and katex styles', async () => {
   const dir = await tmpDir();
   const { html, features } = await renderDocument('inline $E=mc^2$', {
-    baseDir: dir,
+    sourceDir: dir,
     outputPath: path.join(dir, 'out.html'),
   });
   assert.equal(features.math, true);
@@ -45,7 +45,7 @@ test('Mermaid: fences become pre.mermaid and the script is inlined', async () =>
   const dir = await tmpDir();
   const src = '```mermaid\ngraph TD\nA-->B\n```\n';
   const { html, features } = await renderDocument(src, {
-    baseDir: dir,
+    sourceDir: dir,
     outputPath: path.join(dir, 'out.html'),
   });
   assert.equal(features.mermaid, true);
@@ -56,7 +56,7 @@ test('Mermaid: fences become pre.mermaid and the script is inlined', async () =>
 test('code highlighting: documents with code get the hljs theme inlined', async () => {
   const dir = await tmpDir();
   const { html, features } = await renderDocument('```js\nconst a = 1;\n```\n', {
-    baseDir: dir,
+    sourceDir: dir,
     outputPath: path.join(dir, 'out.html'),
   });
   assert.equal(features.code, true);
@@ -67,7 +67,7 @@ test('front matter title takes precedence over the H1', async () => {
   const dir = await tmpDir();
   const src = '---\ntitle: Custom Title\n---\n# Document H1\n';
   const { title } = await renderDocument(src, {
-    baseDir: dir,
+    sourceDir: dir,
     outputPath: path.join(dir, 'out.html'),
   });
   assert.equal(title, 'Custom Title');
@@ -76,7 +76,7 @@ test('front matter title takes precedence over the H1', async () => {
 test('without front matter, the first H1 becomes the title', async () => {
   const dir = await tmpDir();
   const { title } = await renderDocument('# My Title\nbody', {
-    baseDir: dir,
+    sourceDir: dir,
     outputPath: path.join(dir, 'out.html'),
   });
   assert.equal(title, 'My Title');
@@ -86,7 +86,7 @@ test('front matter options take precedence over the resolved opts (kebab-case ke
   const dir = await tmpDir();
   const src = '---\nmax-width: 1670px\n---\n# Hi\n';
   const { html } = await renderDocument(src, {
-    baseDir: dir,
+    sourceDir: dir,
     outputPath: path.join(dir, 'out.html'),
     maxWidth: '1600px', // the config/CLI layer, which front matter must override
   });
@@ -98,7 +98,7 @@ test('front matter accepts the camelCase config key too, and bare numbers become
   const dir = await tmpDir();
   const src = '---\nfontSize: 18\n---\n# Hi\n';
   const { html } = await renderDocument(src, {
-    baseDir: dir,
+    sourceDir: dir,
     outputPath: path.join(dir, 'out.html'),
   });
   assert.match(html, /--base-font-size:\s*18px;/);
@@ -108,7 +108,7 @@ test('front matter booleans are coerced: mermaid: false disables Mermaid', async
   const dir = await tmpDir();
   const src = '---\nmermaid: false\n---\n```mermaid\ngraph TD\nA-->B\n```\n';
   const { html, features } = await renderDocument(src, {
-    baseDir: dir,
+    sourceDir: dir,
     outputPath: path.join(dir, 'out.html'),
   });
   assert.equal(features.mermaid, false);
@@ -119,7 +119,7 @@ test('front matter ignores keys that are not tarmdas options (no error, no effec
   const dir = await tmpDir();
   const src = '---\nauthor: Jane\ndate: 2026-06-08\nmax-width: 900px\n---\n# Hi\n';
   const { html, title } = await renderDocument(src, {
-    baseDir: dir,
+    sourceDir: dir,
     outputPath: path.join(dir, 'out.html'),
   });
   assert.match(html, /--page-max-width:\s*900px;/);
@@ -136,7 +136,7 @@ test('media inlining: PNG becomes Base64, SVG is inlined', async () => {
   await writeFile(path.join(dir, 'logo.svg'), '<?xml version="1.0"?>\n<svg xmlns="http://www.w3.org/2000/svg"><rect/></svg>');
   const src = '![p](dot.png)\n\n![s](logo.svg)\n';
   const { html, media } = await renderDocument(src, {
-    baseDir: dir,
+    sourceDir: dir,
     outputPath: path.join(dir, 'out.html'),
   });
   assert.ok(html.includes('data:image/png;base64'), 'PNG should be Base64-inlined');
@@ -153,7 +153,7 @@ test('home paths: a ~-rooted image is resolved against homedir and inlined', asy
   );
   await writeFile(path.join(dir, 'dot.png'), png);
   const { html, media } = await renderDocument('![p](~/dot.png)\n', {
-    baseDir: dir,
+    sourceDir: dir,
     outputPath: path.join(dir, 'out.html'),
     homedir: dir,
   });
@@ -170,7 +170,7 @@ test('threshold downgrade: media above max-inline-size goes to sidecar assets', 
   );
   await writeFile(path.join(dir, 'dot.png'), png);
   const { html, media } = await renderDocument('![p](dot.png)\n', {
-    baseDir: dir,
+    sourceDir: dir,
     outputPath: path.join(dir, 'out.html'),
     maxInlineSize: 10,
   });
