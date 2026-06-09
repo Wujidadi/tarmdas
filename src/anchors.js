@@ -2,8 +2,14 @@
 // and inserts a clickable anchor link
 // Slug rules: trim, lowercase, strip punctuation, spaces to hyphens, keeping Unicode
 // letters such as CJK
-// Duplicate headings are deduplicated with -1, -2, ... so every id is unique within
+// A trailing "{#custom-id}" marker overrides the auto slug, so the anchor stays stable
+// regardless of how the heading text later changes
+// Duplicate auto slugs are deduplicated with -1, -2, ... so every id is unique within
 // the document, for in-page jumps and TOC links
+
+// Trailing explicit-id marker, e.g. "## Title {#install}"; the id keeps the same
+// character set as a generated slug (letters, digits, hyphen, underscore)
+const EXPLICIT_ID_RE = /\s*\{#([\w-]+)\}\s*$/;
 
 // Build a slug from heading text: keep letters, digits, spaces and hyphens, drop everything else
 function slugify(text) {
@@ -12,6 +18,16 @@ function slugify(text) {
     .toLowerCase()
     .replace(/[^\p{L}\p{N} \-]/gu, '')
     .replace(/\s+/g, '-');
+}
+
+// Strip the trailing "{#id}" marker from the rendered heading by trimming the last
+// text child, so the marker never shows up in the output
+function stripExplicitMarker(children) {
+  for (let j = children.length - 1; j >= 0; j--) {
+    if (children[j].type !== 'text') continue;
+    children[j].content = children[j].content.replace(EXPLICIT_ID_RE, '');
+    return;
+  }
 }
 
 function anchorToken(state, slug) {
@@ -34,11 +50,22 @@ export function headingAnchors(md) {
       const inline = tokens[i + 1];
       if (inline?.type !== 'inline') continue;
 
-      // Slug from the heading's plain text, falling back to "section" for empty
-      // headings; duplicates get a numeric suffix
-      const base = slugify(inline.content) || 'section';
-      let slug = base;
-      for (let n = 1; taken.has(slug); n++) slug = `${base}-${n}`;
+      // An explicit "{#id}" marker wins and is used verbatim (no dedup suffix, so it
+      // stays stable); otherwise slug the plain text, falling back to "section" for
+      // empty headings, and suffix duplicates
+      const explicit = inline.content.match(EXPLICIT_ID_RE);
+      let slug;
+      if (explicit) {
+        slug = explicit[1];
+        // Drop the marker from both the plain text (TOC and heading text read
+        // inline.content) and the rendered children
+        inline.content = inline.content.replace(EXPLICIT_ID_RE, '');
+        stripExplicitMarker(inline.children);
+      } else {
+        const base = slugify(inline.content) || 'section';
+        slug = base;
+        for (let n = 1; taken.has(slug); n++) slug = `${base}-${n}`;
+      }
       taken.add(slug);
 
       tokens[i].attrSet('id', slug);

@@ -127,6 +127,20 @@ test('Anchors: duplicate headings get numeric suffixes; punctuation stripped, sp
   assert.ok(html.includes('id="hello-world-1"'), 'duplicate should get a suffix');
 });
 
+test('Anchors: a trailing {#id} marker overrides the slug and is stripped from output', () => {
+  const { html } = renderMarkdown('# Some Changing Title {#stable}\n');
+  assert.ok(html.includes('<h1 id="stable">'), 'explicit id should win over the slug');
+  assert.ok(html.includes('href="#stable"'), 'the anchor link should point at the explicit id');
+  assert.ok(!html.includes('id="some-changing-title"'), 'the auto slug should not be used');
+  assert.ok(!html.includes('{#stable}'), 'the marker should not remain in the heading text');
+});
+
+test('Anchors: an explicit id stays verbatim even when it collides with another heading', () => {
+  const { html } = renderMarkdown('# First {#dup}\n# Second {#dup}\n');
+  assert.ok(html.includes('<h1 id="dup">First</h1>') || html.includes('id="dup"'), 'explicit ids are not suffixed');
+  assert.ok(!html.includes('id="dup-1"'), 'explicit ids keep their literal value, no numeric suffix');
+});
+
 test('Definition lists: term and definition become dl/dt/dd', () => {
   const { html } = renderMarkdown('Term\n: Definition text\n');
   assert.ok(html.includes('<dl>'));

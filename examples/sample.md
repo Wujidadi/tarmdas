@@ -6,6 +6,7 @@ title: Tarmdas Feature Showcase
 
 This document exercises every feature, to verify the offline conversion result.
 Hover any heading to reveal a clickable anchor (`#`) on the left; the table of contents below also links to each section.
+A heading can pin a stable id with a trailing `{#id}` marker (see "Extended Inline Syntax" below, which resolves to `#inline-syntax`), so the anchor survives any later edits to its text.
 
 ## Table of Contents
 
@@ -30,7 +31,7 @@ Hover any heading to reveal a clickable anchor (`#`) on the left; the table of c
   - [x] Subtask (done)
   - [ ] Subtask (pending)
 
-## Extended Inline Syntax
+## Extended Inline Syntax {#inline-syntax}
 
 - Mark: this is ==a point worth emphasizing==
 - Superscript and subscript: area = πr^2^, water H~2~O, carbon dioxide CO~2~

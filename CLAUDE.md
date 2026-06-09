@@ -24,24 +24,24 @@ Tarmdas 是本地、完全離線的 Markdown → 單一 HTML 轉換工具（非�
 
 進入點 `bin/tarmdas.js` → `src/cli.js`，核心管線在 `src/convert.js`。
 
-| 檔案               | 職責                                                                                                 |
-| ------------------ | ---------------------------------------------------------------------------------------------------- |
-| `bin/tarmdas.js`   | CLI 進入點（shebang），呼叫 `src/cli.js` 的 `run()`                                                  |
-| `src/cli.js`       | 以內建 parseArgs 解析旗標，合併配置檔後調度一次性轉檔或 watch 模式                                   |
-| `src/config.js`    | 專案層級配置檔載入：自輸入檔目錄向上尋找 tarmdas.config.json，作為選項預設值（旗標可覆寫）           |
-| `src/convert.js`   | 核心管線：`renderDocument()` 與 `convertFile()`，組裝完整文件                                        |
-| `src/markdown.js`  | markdown-it 實例與外掛（texmath/KaTeX、highlight.js、Mermaid fence），並回報文件實際用到的功能       |
-| `src/alerts.js`    | GitHub Alerts 警示區塊外掛，將 `> [!NOTE]` 等五種標記的引用轉為帶圖示的警示區塊                      |
-| `src/tasklists.js` | GFM 任務清單外掛，將 `- [ ]`／`- [x]` 開頭的清單項轉為唯讀核取方塊                                   |
-| `src/anchors.js`   | 標題錨點外掛，為各級標題產生 GitHub 風格 slug id 與可點擊錨點連結                                    |
-| `src/toc.js`       | 目錄外掛，將 [[toc]] 佔位標記替換為依標題層級巢狀、連結對應錨點 id 的目錄                            |
-| `src/homepaths.js` | 本地路徑外掛，將連結與圖片中 `~`（家目錄）或 `@/`（設定檔 baseDir）開頭的目標展開為 `file://` URL    |
-| `src/styles.js`    | 使用者自訂樣式編譯，依副檔名選 sass/less/原生 css（less 動態載入）                                   |
-| `src/assets.js`    | KaTeX CSS（字型 base64）、highlight.js 主題、Mermaid JS，以及本地圖片/媒體處理（`processMedia`）     |
-| `src/template.js`  | HTML 文件骨架組裝與 Live Reload 客戶端腳本注入                                                       |
-| `src/themes.js`    | 內建主題登錄表 `PRESETS`、`getPresetCss()`、`mermaidInitScript()`                                    |
-| `src/watch.js`     | 開發伺服器（node:http）+ fs.watch + SSE 即時重載                                                     |
-| `themes/`          | 內建主題 SCSS；`_base.scss` 為共用結構（CSS 變數驅動），`_github-palette.scss` 為 GitHub 淺/深 mixin |
+| 檔案               | 職責                                                                                                    |
+| ------------------ | ------------------------------------------------------------------------------------------------------- |
+| `bin/tarmdas.js`   | CLI 進入點（shebang），呼叫 `src/cli.js` 的 `run()`                                                     |
+| `src/cli.js`       | 以內建 parseArgs 解析旗標，合併配置檔後調度一次性轉檔或 watch 模式                                      |
+| `src/config.js`    | 專案層級配置檔載入：自輸入檔目錄向上尋找 tarmdas.config.json，作為選項預設值（旗標可覆寫）              |
+| `src/convert.js`   | 核心管線：`renderDocument()` 與 `convertFile()`，組裝完整文件                                           |
+| `src/markdown.js`  | markdown-it 實例與外掛（texmath/KaTeX、highlight.js、Mermaid fence），並回報文件實際用到的功能          |
+| `src/alerts.js`    | GitHub Alerts 警示區塊外掛，將 `> [!NOTE]` 等五種標記的引用轉為帶圖示的警示區塊                         |
+| `src/tasklists.js` | GFM 任務清單外掛，將 `- [ ]`／`- [x]` 開頭的清單項轉為唯讀核取方塊                                      |
+| `src/anchors.js`   | 標題錨點外掛，為各級標題產生 GitHub 風格 slug id 與可點擊錨點連結，並支援尾端 `{#id}` 標記覆寫為固定 id |
+| `src/toc.js`       | 目錄外掛，將 [[toc]] 佔位標記替換為依標題層級巢狀、連結對應錨點 id 的目錄                               |
+| `src/homepaths.js` | 本地路徑外掛，將連結與圖片中 `~`（家目錄）或 `@/`（設定檔 baseDir）開頭的目標展開為 `file://` URL       |
+| `src/styles.js`    | 使用者自訂樣式編譯，依副檔名選 sass/less/原生 css（less 動態載入）                                      |
+| `src/assets.js`    | KaTeX CSS（字型 base64）、highlight.js 主題、Mermaid JS，以及本地圖片/媒體處理（`processMedia`）        |
+| `src/template.js`  | HTML 文件骨架組裝與 Live Reload 客戶端腳本注入                                                          |
+| `src/themes.js`    | 內建主題登錄表 `PRESETS`、`getPresetCss()`、`mermaidInitScript()`                                       |
+| `src/watch.js`     | 開發伺服器（node:http）+ fs.watch + SSE 即時重載                                                        |
+| `themes/`          | 內建主題 SCSS；`_base.scss` 為共用結構（CSS 變數驅動），`_github-palette.scss` 為 GitHub 淺/深 mixin    |
 
 ## 開發慣例
 
