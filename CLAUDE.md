@@ -33,7 +33,7 @@ Tarmdas 是本地、完全離線的 Markdown → 單一 HTML 轉換工具（非�
 | `src/markdown.js`  | markdown-it 實例與外掛（texmath/KaTeX、highlight.js、Mermaid fence），並回報文件實際用到的功能          |
 | `src/alerts.js`    | GitHub Alerts 警示區塊外掛，將 `> [!NOTE]` 等五種標記的引用轉為帶圖示的警示區塊                         |
 | `src/tasklists.js` | GFM 任務清單外掛，將 `- [ ]`／`- [x]` 開頭的清單項轉為唯讀核取方塊                                      |
-| `src/anchors.js`   | 標題錨點外掛，為各級標題產生 GitHub 風格 slug id 與可點擊錨點連結，並支援尾端 `{#id}` 標記覆寫為固定 id |
+| `src/anchors.js`   | 錨點外掛：標題產生 GitHub slug id 與錨點連結，尾端 `{#id}` 覆寫固定 id；獨立行 `{#id}` 設非標題隱形錨點 |
 | `src/toc.js`       | 目錄外掛，將 [[toc]] 佔位標記替換為依標題層級巢狀、連結對應錨點 id 的目錄                               |
 | `src/homepaths.js` | 本地路徑外掛，將連結與圖片中 `~`（家目錄）或 `@/`（設定檔 baseDir）開頭的目標展開為 `file://` URL       |
 | `src/styles.js`    | 使用者自訂樣式編譯，依副檔名選 sass/less/原生 css（less 動態載入）                                      |

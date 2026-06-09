@@ -6,10 +6,16 @@
 // regardless of how the heading text later changes
 // Duplicate auto slugs are deduplicated with -1, -2, ... so every id is unique within
 // the document, for in-page jumps and TOC links
+// This module also exports a block-anchor plugin: a standalone "{#id}" line becomes an
+// invisible <span id> target, for linking to a spot that should not be a heading
 
 // Trailing explicit-id marker, e.g. "## Title {#install}"; the id keeps the same
 // character set as a generated slug (letters, digits, hyphen, underscore)
 const EXPLICIT_ID_RE = /\s*\{#([\w-]+)\}\s*$/;
+
+// Standalone block anchor: a line whose only content is "{#id}", used to drop an
+// invisible anchor target at a spot that should not be turned into a heading
+const BLOCK_ANCHOR_RE = /^\{#([\w-]+)\}$/;
 
 // Build a slug from heading text: keep letters, digits, spaces and hyphens, drop everything else
 function slugify(text) {
@@ -72,6 +78,40 @@ export function headingAnchors(md) {
       // Insert the anchor link as the heading's first child (inline.content stays
       // untouched, keeping the plain text available for the TOC later)
       inline.children.unshift(anchorToken(state, slug));
+    }
+  });
+}
+
+// Whether a paragraph holds nothing but a "{#id}" block-anchor marker
+function isBlockAnchor(tokens, i) {
+  return (
+    tokens[i].type === 'paragraph_open' &&
+    tokens[i + 1]?.type === 'inline' &&
+    tokens[i + 2]?.type === 'paragraph_close' &&
+    BLOCK_ANCHOR_RE.test(tokens[i + 1].content.trim())
+  );
+}
+
+/**
+ * markdown-it plugin: replace a standalone "{#id}" line with an empty <span id>,
+ * an invisible anchor target for linking to a spot that is not a heading
+ * The marker must sit on its own line (blank line around it) so it parses as its
+ * own paragraph; the resulting span sits just above the following block, so jumps
+ * land a touch above the target rather than flush with its top edge
+ * @param {import('markdown-it')} md
+ */
+export function blockAnchors(md) {
+  md.core.ruler.push('block_anchors', (state) => {
+    const tokens = state.tokens;
+    for (let i = 0; i + 2 < tokens.length; i++) {
+      if (!isBlockAnchor(tokens, i)) continue;
+      const id = tokens[i + 1].content.trim().match(BLOCK_ANCHOR_RE)[1];
+      // Replace the placeholder paragraph (3 tokens) with a single html_block; after
+      // splice, i points at the new token, so the scan continues onward
+      const token = new state.Token('html_block', '', 0);
+      token.content = `<span id="${id}" class="block-anchor"></span>\n`;
+      token.block = true;
+      tokens.splice(i, 3, token);
     }
   });
 }

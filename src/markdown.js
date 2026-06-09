@@ -30,7 +30,7 @@ import hljs from 'highlight.js';
 
 import { githubAlerts } from './alerts.js';
 import { taskLists } from './tasklists.js';
-import { headingAnchors } from './anchors.js';
+import { headingAnchors, blockAnchors } from './anchors.js';
 import { tableOfContents } from './toc.js';
 import { homePaths } from './homepaths.js';
 import { newTabLinks } from './newtab.js';
@@ -139,6 +139,7 @@ export function createMarkdownIt(opts = {}) {
   md.use(homePaths, { homedir, baseDir });
   if (newTab) md.use(newTabLinks); // after homePaths so rewritten file:// targets are covered
   md.use(headingAnchors);
+  md.use(blockAnchors);
   md.use(tableOfContents); // must come after headingAnchors so TOC links match heading ids
 
   return md;

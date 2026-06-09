@@ -141,6 +141,19 @@ test('Anchors: an explicit id stays verbatim even when it collides with another 
   assert.ok(!html.includes('id="dup-1"'), 'explicit ids keep their literal value, no numeric suffix');
 });
 
+test('Block anchors: a standalone {#id} line becomes an invisible span target', () => {
+  const { html } = renderMarkdown('{#design-notes}\n\nThis paragraph is not a heading.\n');
+  assert.ok(html.includes('<span id="design-notes" class="block-anchor"></span>'), 'an empty anchor span should be emitted');
+  assert.ok(!html.includes('{#design-notes}'), 'the marker text should not remain in the output');
+  assert.ok(!html.includes('<p>{#'), 'the marker paragraph should be replaced, not rendered as text');
+});
+
+test('Block anchors: a {#id} sharing a paragraph with text is left as literal text', () => {
+  const { html } = renderMarkdown('See {#inline} here.\n');
+  assert.ok(html.includes('{#inline}'), 'a marker not on its own line stays literal');
+  assert.ok(!html.includes('class="block-anchor"'), 'no anchor span should be emitted');
+});
+
 test('Definition lists: term and definition become dl/dt/dd', () => {
   const { html } = renderMarkdown('Term\n: Definition text\n');
   assert.ok(html.includes('<dl>'));
