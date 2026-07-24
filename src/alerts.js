@@ -1,17 +1,17 @@
 // GitHub Alerts (GFM alert blocks) plugin: rewrites blockquotes whose first line is
-// exactly one of the [!NOTE]-style markers into div.markdown-alert, with a title
+// one of the [!NOTE]-style markers into div.markdown-alert, with a title
 // row containing the matching Octicon icon and type name
 // Besides GitHub's five standard markers, a non-standard [!DATE] type is supported for
 // highlighting a date or timestamp block, rendered in a neutral gray accent
-// When the marker does not own the first line (other text follows on the same line),
-// the blockquote is left as is, matching GitHub's behavior; the sole exception is [!DATE],
-// which accepts an optional label on the marker line to replace its default "Date" title
+// Any marker may carry an optional label on its own line (e.g. [!CAUTION] Do not touch),
+// which replaces the type's default title; this extends GitHub's behavior, where a marker
+// sharing its line with other text leaves the blockquote unchanged
 
 const MARKER_RE = /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION|DATE)\][ \t]*(?:\n|$)/i;
 
-// [!DATE] with a custom label on the same line, e.g. [!DATE] Last updated 2026-06-06;
-// the captured label replaces the default title (the standard types do not support this)
-const DATE_LABEL_RE = /^\[!DATE\][ \t]+([^\n]+?)[ \t]*(?:\n|$)/i;
+// The same markers followed by a custom label on the same line, e.g. [!DATE] Last updated 2026-06-06;
+// the captured label replaces the type's default title
+const LABEL_RE = /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION|DATE)\][ \t]+([^\n]+?)[ \t]*(?:\n|$)/i;
 
 const TITLES = {
   note: 'Note',
@@ -55,9 +55,9 @@ export function githubAlerts(md) {
       if (tokens[i + 1]?.type !== 'paragraph_open') continue;
       const inline = tokens[i + 2];
       if (inline?.type !== 'inline') continue;
-      // Standard marker owning the line, or [!DATE] followed by a custom label
+      // A marker owning the line, or a marker followed by a custom label
       const m = inline.content.match(MARKER_RE);
-      const labelMatch = m ? null : inline.content.match(DATE_LABEL_RE);
+      const labelMatch = m ? null : inline.content.match(LABEL_RE);
       if (!m && !labelMatch) continue;
       const match = m ?? labelMatch;
 
@@ -72,7 +72,7 @@ export function githubAlerts(md) {
       }
       if (close === -1) continue;
 
-      const type = m ? m[1].toLowerCase() : 'date';
+      const type = (m ? m[1] : labelMatch[1]).toLowerCase();
       tokens[i].tag = 'div';
       tokens[i].attrJoin('class', `markdown-alert markdown-alert-${type}`);
       tokens[close].tag = 'div';
@@ -84,9 +84,9 @@ export function githubAlerts(md) {
         tokens.splice(i + 1, 3);
       }
 
-      // Insert the title row at the start of the block; a [!DATE] label replaces the
+      // Insert the title row at the start of the block; a custom label replaces the
       // default title and is HTML-escaped since it goes straight into an html_block
-      const label = labelMatch ? md.utils.escapeHtml(labelMatch[1]) : TITLES[type];
+      const label = labelMatch ? md.utils.escapeHtml(labelMatch[2]) : TITLES[type];
       const title = new state.Token('html_block', '', 0);
       title.block = true;
       title.content = titleHtml(type, label);

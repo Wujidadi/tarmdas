@@ -16,7 +16,7 @@ By default it produces a self-contained single file: CSS, fonts, the Mermaid scr
 - **LaTeX / KaTeX**: math rendered at build time, fonts embedded as base64
 - **Mermaid**: script embedded and rendered in the browser, no Puppeteer dependency
 - **Code highlighting**: build-time highlighting via highlight.js
-- **GitHub Alerts**: the five `> [!NOTE]` / `> [!IMPORTANT]`-style alert blocks, with markers and colors matching GitHub, plus a non-standard `> [!DATE]` type in a neutral gray for highlighting a date or timestamp — its title defaults to "Date" but a label on the marker line (e.g. `> [!DATE] Last updated: 2026-06-06`) overrides it; all auto-switch with the theme's light/dark mode
+- **GitHub Alerts**: the five `> [!NOTE]` / `> [!IMPORTANT]`-style alert blocks, with markers and colors matching GitHub, plus a non-standard `> [!DATE]` type in a neutral gray for highlighting a date or timestamp; any type's title can be overridden with a label on the marker line (e.g. `> [!CAUTION] Do not touch` or `> [!DATE] Last updated: 2026-06-06`), otherwise it defaults to the type name; all auto-switch with the theme's light/dark mode
 - **Task lists**: `- [ ]` / `- [x]` GFM task lists become read-only checkboxes (matching GitHub: display-only, not clickable)
 - **Footnotes**: `[^1]` footnotes collected into a bottom section with backlinks
 - **Heading anchors**: every heading gets a GitHub-style slug id (CJK preserved) and a clickable anchor, for in-page jumps and shareable section links; append a `{#custom-id}` marker (e.g. `## Release notes {#changelog}`) to pin an explicit id that stays stable no matter how the heading text later changes — the marker is stripped from the output and the id is used verbatim (no dedup suffix)

@@ -33,10 +33,13 @@ test('GitHub Alerts: marker separated from body by a blank line is also recogniz
   assert.ok(!html.includes('[!WARNING]'));
 });
 
-test('GitHub Alerts: marker with other text on the same line stays a regular quote', () => {
-  const { html } = renderMarkdown('> [!NOTE] same-line text\n');
-  assert.ok(html.includes('<blockquote>'), 'should remain a blockquote');
-  assert.ok(!html.includes('markdown-alert'), 'should not become an alert block');
+test('GitHub Alerts: a standard marker with a same-line label becomes an alert titled by that label', () => {
+  const { html } = renderMarkdown('> [!CAUTION] Do not touch\n> body text\n');
+  assert.ok(html.includes('markdown-alert-caution'), 'should become a caution alert');
+  assert.ok(html.includes('Do not touch'), 'custom label should appear as the title');
+  assert.ok(!html.includes('>Caution<'), 'default "Caution" title should be replaced');
+  assert.ok(html.includes('body text'), 'body should be preserved');
+  assert.ok(!html.includes('[!CAUTION]'), 'marker should not remain');
 });
 
 test('GitHub Alerts: [!DATE] accepts a custom label that replaces the default title', () => {
