@@ -1,6 +1,6 @@
 {
   "name": "tarmdas",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Local, fully offline Markdown to single-HTML converter (KaTeX, Mermaid, SCSS/LESS, Live Reload)",
   "type": "module",
   "bin": {
