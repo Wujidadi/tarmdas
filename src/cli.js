@@ -162,8 +162,7 @@ export async function run(argv = process.argv.slice(2)) {
 
   try {
     const { outputPath, title, media } = await convertFile(input, options);
-    const rel = path.relative(process.cwd(), outputPath);
-    let msg = `Written: ${rel} (title: ${title})`;
+    let msg = `Written: ${path.resolve(outputPath)} (title: ${title})`;
     if (media.inlined) msg += `, ${media.inlined} media inlined`;
     if (media.copied.length) msg += `, ${media.copied.length} sidecar asset(s)`;
     process.stdout.write(`${msg}\n`);
